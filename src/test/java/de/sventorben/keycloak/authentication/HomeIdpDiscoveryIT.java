@@ -36,32 +36,42 @@ class HomeIdpDiscoveryIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeIdpDiscoveryIT.class);
 
-    private static final int KEYCLOAK_HTTP_PORT = 8080;
+    private static final String KEYCLOAK_DIST = System.getProperty("keycloak.dist", "keycloak-x");
+    private static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version", "latest");
     private static final String KEYCLOAK_ADMIN_PASS = "admin";
     private static final String KEYCLOAK_ADMIN_USER = "admin";
     private static final String KEYCLOAK_BASE_URL = "http://keycloak:8080";
+    private static final int KEYCLOAK_HTTP_PORT = 8080;
 
     private static final String REALM_TEST = "test-realm";
 
     private static final Network NETWORK = Network.newNetwork();
 
     @Container
-    private static final KeycloakContainer KEYCLOAK_CONTAINER = createKeycloakContainer(
-        System.getProperty("keycloak.dist", "keycloak-x"), System.getProperty("keycloak.version", "latest"))
+    private static final KeycloakContainer KEYCLOAK_CONTAINER = createKeycloakContainer()
         .withProviderClassesFrom("target/classes")
         .withExposedPorts(KEYCLOAK_HTTP_PORT)
         .withLogConsumer(new Slf4jLogConsumer(LOGGER).withSeparateOutputStreams())
-        .withRealmImportFiles("/test-realm.json", "/idp-realm.json")
         .withStartupTimeout(Duration.ofSeconds(30))
         .withNetwork(NETWORK)
         .withNetworkAliases("keycloak")
         .withAdminUsername(KEYCLOAK_ADMIN_USER)
         .withAdminPassword(KEYCLOAK_ADMIN_PASS);
 
-    private static KeycloakContainer createKeycloakContainer(String dist, String version) {
-        String fullImage = "quay.io/keycloak/" + dist + ":" + version;
+    private static KeycloakContainer createKeycloakContainer() {
+        String fullImage = "quay.io/keycloak/" + KEYCLOAK_DIST + ":" + KEYCLOAK_VERSION;
         LOGGER.info("Running test with Keycloak image: " + fullImage);
-        return new KeycloakContainer(fullImage);
+        KeycloakContainer container = new KeycloakContainer(fullImage);
+        if (KEYCLOAK_DIST.contains("-x")) {
+            container = container
+                .withRealmImportFile("/test-realm.json")
+                .withRealmImportFile("/idp-realm.json");
+        } else {
+            container = container
+                .withRealmImportFile("test-realm.json")
+                .withRealmImportFile("idp-realm.json");
+        }
+        return container;
     }
 
     @Container
@@ -84,30 +94,30 @@ class HomeIdpDiscoveryIT {
     @BeforeEach
     public void gotoLoginPage() {
         webDriver = setupDriver();
-        new AccountConsolePage(webDriver, KEYCLOAK_BASE_URL).signIn();
+        new AccountConsolePage(webDriver, getAuthServerUrlInternal()).signIn();
     }
 
     @Test
     public void redirectIfUserHasDomain() {
-        new TestRealmLoginPage(webDriver, KEYCLOAK_BASE_URL).signIn("test@example.com");
+        new TestRealmLoginPage(webDriver, getAuthServerUrlInternal()).signIn("test@example.com");
         assertRedirectedToIdp();
     }
 
     @Test
     public void redirectIfUserHasAlternateDomain() {
-        new TestRealmLoginPage(webDriver, KEYCLOAK_BASE_URL).signIn("test2@example.net");
+        new TestRealmLoginPage(webDriver, getAuthServerUrlInternal()).signIn("test2@example.net");
         assertRedirectedToIdp();
     }
 
     @Test
     public void doNotRedirectIfUserHasNonConfiguredDomain() {
-        new TestRealmLoginPage(webDriver, KEYCLOAK_BASE_URL).signIn("test3@example.org");
+        new TestRealmLoginPage(webDriver, getAuthServerUrlInternal()).signIn("test3@example.org");
         assertNotRedirected();
     }
 
     @Test
     public void doNotRedirectIfUserEmailIsNotVerified() {
-        new TestRealmLoginPage(webDriver, KEYCLOAK_BASE_URL).signIn("test4@example.com");
+        new TestRealmLoginPage(webDriver, getAuthServerUrlInternal()).signIn("test4@example.com");
         assertNotRedirected();
     }
 
@@ -126,7 +136,7 @@ class HomeIdpDiscoveryIT {
 
             @Test
             public void willNotRedirectToIdp() {
-                new TestRealmLoginPage(webDriver, KEYCLOAK_BASE_URL).signIn(username);
+                new TestRealmLoginPage(webDriver, getAuthServerUrlInternal()).signIn(username);
                 assertNotRedirected();
             }
         }
@@ -141,13 +151,13 @@ class HomeIdpDiscoveryIT {
 
             @Test
             public void willRedirectToIdp() {
-                new TestRealmLoginPage(webDriver, KEYCLOAK_BASE_URL).signIn(username);
+                new TestRealmLoginPage(webDriver, getAuthServerUrlInternal()).signIn(username);
                 assertRedirectedToIdp();
             }
 
             @Test
             public void willForwardLoginHint() {
-                new TestRealmLoginPage(webDriver, KEYCLOAK_BASE_URL).signIn(username);
+                new TestRealmLoginPage(webDriver, getAuthServerUrlInternal()).signIn(username);
                 assertThat(webDriver.getCurrentUrl()).contains("&login_hint=idp-test5-username&");
             }
         }
@@ -187,21 +197,28 @@ class HomeIdpDiscoveryIT {
         flows.updateAuthenticatorConfig(authenticationConfigId, authenticatorConfig);
     }
 
+    private static String getAuthServerUrlInternal() {
+        if (KEYCLOAK_DIST.contains("-x")) {
+            return KEYCLOAK_BASE_URL;
+        }
+        return KEYCLOAK_BASE_URL + "/auth";
+    }
+
     private static Keycloak getKeycloakAdminClient() {
         return Keycloak.getInstance(KEYCLOAK_CONTAINER.getAuthServerUrl(), "master",
             KEYCLOAK_CONTAINER.getAdminUsername(), KEYCLOAK_CONTAINER.getAdminPassword(), "admin-cli");
     }
 
     private void assertRedirectedToIdp() {
-        assertRedirectedTo("/realms/idp/protocol/openid-connect/auth");
+        assertRedirectedTo(KEYCLOAK_BASE_URL + "/realms/idp/protocol/openid-connect/auth");
     }
 
     private void assertNotRedirected() {
-        assertRedirectedTo("/realms/test-realm/login-actions/authenticate?client_id=account-console");
+        assertRedirectedTo(getAuthServerUrlInternal() + "/realms/test-realm/login-actions/authenticate?client_id=account-console");
     }
 
-    private void assertRedirectedTo(String s) {
-        assertThat(webDriver.getCurrentUrl()).startsWith(KEYCLOAK_BASE_URL + s);
+    private void assertRedirectedTo(String url) {
+        assertThat(webDriver.getCurrentUrl()).startsWith(url);
     }
 
     private static RemoteWebDriver setupDriver() {

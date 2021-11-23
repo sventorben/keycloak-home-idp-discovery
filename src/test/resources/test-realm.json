@@ -1136,14 +1136,6 @@
         }
       }
     ],
-    "org.keycloak.userprofile.UserProfileProvider": [
-      {
-        "id": "e9f21986-6852-4762-ada7-5e4aaca76702",
-        "providerId": "declarative-user-profile",
-        "subComponents": {},
-        "config": {}
-      }
-    ],
     "org.keycloak.keys.KeyProvider": [
       {
         "id": "3db3323a-eb51-4fea-8473-a479b4a7ee1c",
