@@ -52,7 +52,7 @@ class HomeIdpDiscoveryIT {
         .withProviderClassesFrom("target/classes")
         .withExposedPorts(KEYCLOAK_HTTP_PORT)
         .withLogConsumer(new Slf4jLogConsumer(LOGGER).withSeparateOutputStreams())
-        .withStartupTimeout(Duration.ofSeconds(30))
+        .withStartupTimeout(Duration.ofSeconds(60))
         .withNetwork(NETWORK)
         .withNetworkAliases("keycloak")
         .withAdminUsername(KEYCLOAK_ADMIN_USER)
