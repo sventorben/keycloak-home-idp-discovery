@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Default version to use when preparing a release."
+        required: true
+        default: "X.Y.Z"
+      developmentVersion:
+        description: "Default version to use for new local working copy."
+        required: true
+        default: "X.Y.Z-SNAPSHOT"
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Configure Git User
+      run: |
+        git config user.email "actions@github.com"
+        git config user.name "GitHub Actions"
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Cache maven repository
+      uses: actions/cache@v2
+      with:
+        path: "~/.m2/repository"
+        key: "${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}"
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Release to GitHub packages
+      run: |
+        mvn -B clean release:prepare release:perform -s maven-github-settings.xml --file pom.xml -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+        git push origin v${{ github.event.inputs.releaseVersion }}
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    - name: Release to GitHub releases
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "target/keycloak-home-idp-discovery.jar"
+        body_path: "RELEASELOG.md"
+        fail_on_unmatched_files: true
+        tag_name: v${{ github.event.inputs.releaseVersion }}
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    - name: Create Pull Request
+      id: create-pr
+      uses: peter-evans/create-pull-request@v3
+      with:
+        commit-message: "chore(release): Prepare next version"
+        delete-branch: "true"
+        branch: "release/${{ github.event.inputs.releaseVersion }}"
+        base: "main"
+        title: "chore(release): Prepare next version after release ${{ github.event.inputs.releaseVersion }}"
+        body: "Automated PR to prepare next version after release ${{ github.event.inputs.releaseVersion }}"
+        labels: "release"
+        assignees: "sventorben"
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
