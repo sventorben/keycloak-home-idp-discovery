@@ -87,6 +87,9 @@ public final class HomeIdpDiscoveryAuthenticatorFactory implements Authenticator
     @Override
     public Map<String, String> getOperationalInfo() {
         String version = getClass().getPackage().getImplementationVersion();
+        if (version == null) {
+            version = "dev-snapshot";
+        }
         return Map.of("Version", version);
     }
 }
