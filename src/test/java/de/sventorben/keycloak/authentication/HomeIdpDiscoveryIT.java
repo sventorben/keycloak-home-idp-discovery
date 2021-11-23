@@ -27,7 +27,6 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.time.Duration;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -163,7 +162,7 @@ class HomeIdpDiscoveryIT {
     }
 
     private void setForwarding(Boolean enabled) {
-        Keycloak admin = KEYCLOAK_CONTAINER.getKeycloakAdminClient();
+        Keycloak admin = getKeycloakAdminClient();
         AuthenticationManagementResource flows = admin.realm(REALM_TEST).flows();
         AuthenticationExecutionInfoRepresentation execution = flows
             .getExecutions("discover home idp").stream()
@@ -186,6 +185,11 @@ class HomeIdpDiscoveryIT {
         config.put("forwardToLinkedIdp", enabled.toString());
         authenticatorConfig.setConfig(config);
         flows.updateAuthenticatorConfig(authenticationConfigId, authenticatorConfig);
+    }
+
+    private static Keycloak getKeycloakAdminClient() {
+        return Keycloak.getInstance(KEYCLOAK_CONTAINER.getAuthServerUrl(), "master",
+            KEYCLOAK_CONTAINER.getAdminUsername(), KEYCLOAK_CONTAINER.getAdminPassword(), "admin-cli");
     }
 
     private void assertRedirectedToIdp() {
