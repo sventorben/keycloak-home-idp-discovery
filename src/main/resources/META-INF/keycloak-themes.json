@@ -1,0 +1,8 @@
+{
+    "themes": [
+        {
+            "name" : "home-idp-discovery",
+            "types": [ "admin" ]
+        }
+    ]
+}
