@@ -13,12 +13,13 @@ This is a simple Keycloak authenticator to redirect users to their home identity
 
 ## What is it good for?
 
-TODO
+When a federated user wants to login via Keycloak, Keycloak will present a username/password form and a list of configured identity providers to the user. The user needs to choose an identity provider to get redirected.
+This authenticator allows to skip the step of selecting an identity provider.
 
 ## How does it work?
 
-TODO
-
+If this authenticator gets configured as part of a browser based login flow, Keycloak will present a username form (without password form and without list of configured identity providers).
+A user can then enter an email address. Keycloak will then choose an identity provider based on the provided email domain and forward the user to the chosen provider.
 
 ## How to install?
 
@@ -55,7 +56,46 @@ It may happen that I remove older packages without prior notice, because the sto
 
 ## How to configure?
 
-TODO
+### Configure email domains
+
+Email domains can be configured per identity provider. Currently, this can only be achieved via [Identity Providerds REST API](https://www.keycloak.org/docs-api/15.0/rest-api/index.html#_identity_providers_resource).
+```json
+PUT /{realm}/identity-provider/instances/{alias}
+{
+  ...
+  "config": {
+    "home.idp.discovery.domains": "example.com##example.net",
+    ...
+  },
+  ...
+}
+```
+
+Note that domains need to be separated by two hashtags (`##`).
+
+You can also use the [Admin CLI (kcadm)](https://www.keycloak.org/docs/latest/server_admin/#identity-provider-operations):
+```shell
+kcadm.sh update identity-provider/instances/{alias} -s 'config."home.idp.discovery.domains"="example.com##example.net"'
+```
+
+### Configuration options
+
+![Authenticator configuration](docs/images/authenticator-config.jpg)
+
+| Option | Description |
+| --- | --- |
+| Forward to linked IdP | If switched on, federated users (with already linked IdPs) will be forwarded to a linked IdP even if no IdP has been configured for the user's email address. Federated users can also use their local username for login instead of their email address.<br><br> If switched off, users will only be forwarded to IdPs with matching email domains. |
+
+### Show configured email domains in Admin console
+* Navigate to `Realm Settings`
+* Click `Themes` tab
+* Choose `home-idp-discovery` for the `Admin Console Theme`
+* Click `Save`
+* Reload the admin console (press F5 in your browser)
+* Navigate to an identity provider
+* Click `Home IdP Discovery` tab
+
+![View email domains](docs/images/view-idp-email-domains.jpg)
 
 ## Frequently asked questions
 
