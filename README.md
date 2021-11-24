@@ -48,7 +48,7 @@ For Docker-based setups mount or copy the jar to `/opt/jboss/keycloak/providers`
 
 ### Maven/Gradle
 
-Packages are being released to GitHub Packages. You find the coordinates [here](https://github.com/sventorben/keycloak-home-idp-discovery/packages/779937/versions)!
+Packages are being released to GitHub Packages. You find the coordinates [here](https://github.com/sventorben/keycloak-home-idp-discovery/packages/1112199/versions)!
 
 It may happen that I remove older packages without prior notice, because the storage is limited on the free tier.
 
