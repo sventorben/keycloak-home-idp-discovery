@@ -28,7 +28,7 @@ public final class HomeIdpDiscoveryAuthenticatorFactory implements Authenticator
 
     @Override
     public String getDisplayType() {
-        return "Home IdP Discovery (Existing users)";
+        return "Home IdP Discovery";
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class HomeIdpDiscoveryAuthenticatorFactory implements Authenticator
 
     @Override
     public String getHelpText() {
-        return "Redirects existing users to their home identity provider";
+        return "Redirects users to their home identity provider";
     }
 
     @Override
