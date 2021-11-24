@@ -2,9 +2,9 @@
 
     <ol class="breadcrumb">
         <li><a href="#/realms/{{realm.realm}}/identity-provider-settings">{{:: 'identity-providers' | translate}}</a></li>
-        <li data-ng-show="!newIdentityProvider && identityProvider.displayName">{{identityProvider.displayName}}</li>
-        <li data-ng-show="!newIdentityProvider && !identityProvider.displayName">{{identityProvider.alias}}</li>
-        <li data-ng-show="newIdentityProvider">{{:: 'add-identity-provider' | translate}}</li>
+        <li data-ng-show="identityProvider.displayName"><a href="#/realms/{{realm.realm}}/identity-provider-settings/provider/{{identityProvider.providerId}}/{{identityProvider.alias}}">{{identityProvider.displayName}}</a></li>
+        <li data-ng-show="!identityProvider.displayName"><a href="#/realms/{{realm.realm}}/identity-provider-settings/provider/{{identityProvider.providerId}}/{{identityProvider.alias}}">{{identityProvider.alias}}</a></li>
+        <li>{{:: 'homeIdpDiscovery' | translate}}</li>
     </ol>
 
     <kc-tabs-identity-provider></kc-tabs-identity-provider>
