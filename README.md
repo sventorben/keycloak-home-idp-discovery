@@ -58,7 +58,7 @@ It may happen that I remove older packages without prior notice, because the sto
 
 ### Configure email domains
 
-Email domains can be configured per identity provider. Currently, this can only be achieved via [Identity Providerds REST API](https://www.keycloak.org/docs-api/15.0/rest-api/index.html#_identity_providers_resource).
+Email domains can be configured per identity provider. Currently, this can only be achieved via [Identity Providers REST API](https://www.keycloak.org/docs-api/15.0/rest-api/index.html#_identity_providers_resource).
 ```json
 PUT /{realm}/identity-provider/instances/{alias}
 {
