@@ -9,10 +9,7 @@ import org.keycloak.services.resources.admin.AdminRoot;
 import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
 import org.keycloak.services.resources.admin.permissions.AdminPermissions;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -54,6 +51,26 @@ public final class HomeIdpDiscoveryRealmResource {
             IdentityProviderModelConfig config = new IdentityProviderModelConfig(idp);
             idpConfig.setDomains(config.getDomains().collect(Collectors.toList()));
             responseBuilder = Response.ok(idpConfig);
+        }
+
+        return responseBuilder.build();
+    }
+
+    @PUT
+    @Path("/{idpAlias}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response domains(@PathParam("idpAlias") String idpAlias, IdpConfig idpConfig) {
+        adminAuth.realm().requireManageIdentityProviders();
+
+        IdentityProviderModel idp = managedRealm.getIdentityProviderByAlias(idpAlias);
+
+        Response.ResponseBuilder responseBuilder;
+        if (idp == null) {
+            responseBuilder = Response.status(Response.Status.NOT_FOUND);
+        } else {
+            IdentityProviderModelConfig config = new IdentityProviderModelConfig(idp);
+            config.setDomains(config.getDomains().collect(Collectors.toList()));
+            responseBuilder = Response.status(Response.Status.NO_CONTENT);
         }
 
         return responseBuilder.build();
