@@ -300,6 +300,7 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-support</artifactId>
             <version>${version.selenium}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
