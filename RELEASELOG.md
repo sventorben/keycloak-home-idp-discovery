@@ -1,4 +1,4 @@
-* Initial version
+* Update Keycloak dependencies to 15.1.0
 
 > ⚠️ **Production readiness**:
 >
