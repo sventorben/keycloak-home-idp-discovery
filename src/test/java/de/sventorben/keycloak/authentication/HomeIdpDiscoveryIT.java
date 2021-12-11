@@ -25,6 +25,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.lang.module.ModuleDescriptor;
+import java.lang.module.ModuleDescriptor.Version;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -61,16 +63,15 @@ class HomeIdpDiscoveryIT {
     private static KeycloakContainer createKeycloakContainer() {
         String fullImage = "quay.io/keycloak/" + KEYCLOAK_DIST + ":" + KEYCLOAK_VERSION;
         LOGGER.info("Running test with Keycloak image: " + fullImage);
-        KeycloakContainer container = new KeycloakContainer(fullImage);
-        if (KEYCLOAK_DIST.contains("-x")) {
-            container = container
-                .withRealmImportFile("/test-realm.json")
-                .withRealmImportFile("/idp-realm.json");
+        KeycloakContainer container;
+        if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST)) {
+            container = new KeycloakXContainer(KEYCLOAK_VERSION);
         } else {
-            container = container
-                .withRealmImportFile("test-realm.json")
-                .withRealmImportFile("idp-realm.json");
+            container = new KeycloakContainer(fullImage);
         }
+        container = container
+            .withRealmImportFile("test-realm.json")
+            .withRealmImportFile("idp-realm.json");
         return container;
     }
 
