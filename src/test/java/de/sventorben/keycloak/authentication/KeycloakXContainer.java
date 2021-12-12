@@ -20,12 +20,12 @@ final class KeycloakXContainer extends KeycloakContainer {
     @Override
     protected void configure() {
         super.configure();
-        if ("latest".equalsIgnoreCase(version) || Version.parse(version).compareTo(Version.parse("15.1")) >= 0) {
+        if (!"latest".equalsIgnoreCase(version) && Version.parse(version).compareTo(Version.parse("15.1")) < 0) {
             if (providerClassLocation != null) {
-                createKeycloakExtensionDeployment("/opt/keycloak/providers", "providers.jar", providerClassLocation);
+                createKeycloakExtensionDeployment("/opt/jboss/keycloak/providers", "providers.jar", providerClassLocation);
             }
             List<String> commandParts = new ArrayList<>();
-            commandParts.add("start-dev");
+            commandParts.add("--auto-config");
             commandParts.add("--http-enabled=true");
             this.setCommand(commandParts.toArray(new String[0]));
         }
