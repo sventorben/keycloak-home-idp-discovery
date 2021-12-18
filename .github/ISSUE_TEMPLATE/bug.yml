@@ -38,8 +38,8 @@ body:
     label: Version
     description: |
       examples:
-        - **Keycloak**: 15.1.0 (quarkus/wildfly)
-        - **This extension**:  15.0.1
+        - **Keycloak**: 16.0.0 (quarkus/wildfly)
+        - **This extension**:  16.0.0
     value: |
         - Keycloak:
         - This extension:
