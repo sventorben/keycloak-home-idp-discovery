@@ -1,4 +1,4 @@
-* Update Keycloak dependencies to 16.1.0
+* Update Keycloak dependencies to 16.1.1
 
 > ⚠️ **Production readiness**:
 >
