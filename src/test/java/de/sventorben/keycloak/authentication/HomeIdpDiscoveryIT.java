@@ -60,8 +60,22 @@ class HomeIdpDiscoveryIT {
         .withAdminUsername(KEYCLOAK_ADMIN_USER)
         .withAdminPassword(KEYCLOAK_ADMIN_PASS);
 
+
     private static KeycloakContainer createKeycloakContainer() {
         String fullImage = "quay.io/keycloak/" + KEYCLOAK_DIST + ":" + KEYCLOAK_VERSION;
+        if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST) &&
+            !"latest".equalsIgnoreCase(KEYCLOAK_VERSION) && Version.parse(KEYCLOAK_VERSION).compareTo(Version.parse("17")) >= 0) {
+            fullImage = fullImage.replace("keycloak-x", "keycloak");
+        }
+        if ("keycloak".equalsIgnoreCase(KEYCLOAK_DIST) &&
+            !"latest".equalsIgnoreCase(KEYCLOAK_VERSION) && Version.parse(KEYCLOAK_VERSION).compareTo(Version.parse("17")) >= 0) {
+            fullImage = fullImage + "-legacy";
+        }
+        LOGGER.info("Running test with Keycloak image: " + fullImage);
+        if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST) &&
+            !"latest".equalsIgnoreCase(KEYCLOAK_VERSION) && Version.parse(KEYCLOAK_VERSION).compareTo(Version.parse("15.1")) < 0) {
+            return new KeycloakXContainer(fullImage);
+        }
         LOGGER.info("Running test with Keycloak image: " + fullImage);
         KeycloakContainer container;
         if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST)) {
