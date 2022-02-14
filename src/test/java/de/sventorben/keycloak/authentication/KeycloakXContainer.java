@@ -12,8 +12,8 @@ final class KeycloakXContainer extends KeycloakContainer {
     private String providerClassLocation;
     private final String version;
 
-    KeycloakXContainer(String version) {
-        super("quay.io/keycloak/keycloak-x:" + version);
+    KeycloakXContainer(String fullImage, String version) {
+        super(fullImage);
         this.version = version;
     }
 
