@@ -72,13 +72,11 @@ class HomeIdpDiscoveryIT {
             fullImage = fullImage + "-legacy";
         }
         LOGGER.info("Running test with Keycloak image: " + fullImage);
+        KeycloakContainer container;
         if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST) &&
             !"latest".equalsIgnoreCase(KEYCLOAK_VERSION) && Version.parse(KEYCLOAK_VERSION).compareTo(Version.parse("15.1")) < 0) {
-            return new KeycloakXContainer(fullImage);
-        }
-        LOGGER.info("Running test with Keycloak image: " + fullImage);
-        KeycloakContainer container;
-        if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST)) {
+            container = new KeycloakXContainer(fullImage);
+        } else if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST)) {
             container = new KeycloakXContainer(KEYCLOAK_VERSION);
         } else {
             container = new KeycloakContainer(fullImage);
