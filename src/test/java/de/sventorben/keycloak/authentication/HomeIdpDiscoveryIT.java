@@ -76,7 +76,7 @@ class HomeIdpDiscoveryIT {
         if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST) &&
             !"latest".equalsIgnoreCase(KEYCLOAK_VERSION) && Version.parse(KEYCLOAK_VERSION).compareTo(Version.parse("15.1")) < 0) {
             container = new KeycloakXContainer(fullImage, KEYCLOAK_VERSION);
-        } else if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST)) {
+        } else if ("keycloak-x".equalsIgnoreCase(KEYCLOAK_DIST) || ("keycloak".equalsIgnoreCase(KEYCLOAK_DIST) && "latest".equalsIgnoreCase(KEYCLOAK_VERSION))) {
             container = new KeycloakXContainer(fullImage, KEYCLOAK_VERSION);
         } else {
             container = new KeycloakContainer(fullImage);
