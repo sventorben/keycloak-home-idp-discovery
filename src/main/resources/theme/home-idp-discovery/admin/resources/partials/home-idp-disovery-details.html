@@ -15,9 +15,15 @@
         <li ng-repeat="domain in homeIdpDiscoveryConfig.domains | orderBy track by $index">
             {{domain}}
         </li>
+
     </ul>
-
-
+    
+    <h1>{{:: 'isFallback' | translate}}</h1>
+    <ul>
+        <li>
+            {{homeIdpDiscoveryConfig.fallback}}
+        </li>
+    </ul>        
 </div>
 
 <kc-menu></kc-menu>
