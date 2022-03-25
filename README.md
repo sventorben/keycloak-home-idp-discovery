@@ -60,6 +60,18 @@ PUT /{realm}/identity-provider/instances/{alias}
   ...
 }
 ```
+If you need to manage many identity providers and had a default fallback identity server for non matching domains
+```json
+PUT /{realm}/identity-provider/instances/{alias}
+{
+  ...
+  "config": {
+    "home.idp.discovery.isfallback": "true",
+    ...
+  },
+  ...
+}
+```
 
 Note that domains need to be separated by two hashtags (`##`).
 
@@ -67,7 +79,10 @@ You can also use the [Admin CLI (kcadm)](https://www.keycloak.org/docs/latest/se
 ```shell
 kcadm.sh update identity-provider/instances/{alias} -s 'config."home.idp.discovery.domains"="example.com##example.net"'
 ```
-
+You can also set the alias as the fallback identity server
+```shell
+kcadm.sh update identity-provider/instances/{alias} -s 'config."home.idp.discovery.isfallback"="true"'
+```
 ### Configuration options
 
 ![Authenticator configuration](docs/images/authenticator-config.jpg)
@@ -87,6 +102,7 @@ kcadm.sh update identity-provider/instances/{alias} -s 'config."home.idp.discove
 
 ![View email domains](docs/images/view-idp-email-domains.jpg)
 
+![View email domains](docs/images/view-idp-email-fallback.jpg)
 ## Frequently asked questions
 
 ### Does it (already) work with Quarkus/Keycloak.X?
