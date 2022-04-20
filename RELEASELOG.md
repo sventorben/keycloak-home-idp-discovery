@@ -1,4 +1,4 @@
-* Update Keycloak dependencies to 17.0.1
+* Update Keycloak dependencies to 18.0.0
 
 > ⚠️ **Production readiness**:
 >

@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        keycloak_version: [ 17.0.1, latest ]
+        keycloak_version: [ 17.0.1, 18.0.0, latest ]
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
