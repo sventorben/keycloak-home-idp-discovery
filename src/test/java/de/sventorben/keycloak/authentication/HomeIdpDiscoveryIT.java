@@ -27,7 +27,6 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -216,7 +215,7 @@ class HomeIdpDiscoveryIT {
 
     private static RemoteWebDriver setupDriver() {
         RemoteWebDriver driver = BROWSER.getWebDriver();
-        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
         return driver;
     }
 

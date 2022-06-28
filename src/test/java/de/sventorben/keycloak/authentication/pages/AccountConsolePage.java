@@ -8,6 +8,8 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+
 public class AccountConsolePage {
 
     private final WebDriver webDriver;
@@ -24,7 +26,7 @@ public class AccountConsolePage {
 
     public void signIn() {
         webDriver.navigate().to(keycloakBaseUrl + "/realms/test-realm/account/");
-        WebElement landingSignInButton = new WebDriverWait(webDriver, 10)
+        WebElement landingSignInButton = new WebDriverWait(webDriver, Duration.ofSeconds(10))
             .until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[id='landingSignInButton']")));
         landingSignInButton.click();
     }
