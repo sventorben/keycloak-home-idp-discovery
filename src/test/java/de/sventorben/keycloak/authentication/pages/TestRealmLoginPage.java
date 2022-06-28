@@ -7,6 +7,8 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class TestRealmLoginPage {
@@ -28,7 +30,7 @@ public class TestRealmLoginPage {
     }
 
     public void signIn(String username) {
-        new WebDriverWait(webDriver, 10).until(ExpectedConditions.visibilityOf(usernameInput));
+        new WebDriverWait(webDriver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOf(usernameInput));
         usernameInput.sendKeys(username);
         signInButton.click();
     }
