@@ -56,54 +56,42 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             context.cancelLogin();
             return;
         }
-
-        String username = setUserInContext(context, formData);
-        if (username == null) {
-            return;
-        }
-
-        UserModel user = context.getUser();
-
-        final Optional<IdentityProviderModel> homeIdp = discoverHomeIdp(context, user, username);
-
-        if (homeIdp.isEmpty()) {
-            context.attempted();
-        } else {
-            new Redirector(context).redirectTo(homeIdp.get());
-        }
-    }
-
-    private String setUserInContext(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
+        
         context.clearUser();
-
-        String username = inputData.getFirst(AuthenticationManager.FORM_USERNAME);
-
+        String username = formData.getFirst(AuthenticationManager.FORM_USERNAME);
+        
         if (username != null) {
             username = username.trim();
-            if ("".equalsIgnoreCase(username))
-                username = null;
-        }
-
-        if (username == null) {
+        } else {
             context.getEvent().error(Errors.USER_NOT_FOUND);
             Response challengeResponse = challenge(context, getDefaultChallengeMessage(context), FIELD_USERNAME);
             context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
-            return null;
+            return;
         }
 
-        context.getEvent().detail(Details.USERNAME, username);
-        context.getAuthenticationSession().setAuthNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME, username);
-
+        UserModel user = null;
         try {
-            UserModel user = KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(), username);
-            if (user != null) {
-                context.setUser(user);
-            }
+            user = KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(), username);
         } catch (ModelDuplicateException ex) {
             LOG.debugf(ex,"Could not find user %s", username);
         }
 
-        return username;
+        if (user != null) {
+            context.setUser(user);
+        }
+
+        final Optional<IdentityProviderModel> homeIdp = discoverHomeIdp(context, user, username);
+
+        if (!homeIdp.isEmpty()) {
+            new Redirector(context).redirectTo(homeIdp.get());
+        } else if (user != null) {
+            context.attempted();
+        } else {
+            context.getEvent().error(Errors.USER_NOT_FOUND);
+            Response challengeResponse = challenge(context, getDefaultChallengeMessage(context), FIELD_USERNAME);
+            context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
+            return;
+        }
     }
 
     protected Response challenge(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
@@ -199,7 +187,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
 
     private static Optional<String> getEmailDomain(UserModel user) {
         Optional<String> domain = Optional.empty();
-        if (user.isEnabled() && user.isEmailVerified()) {
+        if (user.isEnabled()) {
             String email = user.getEmail();
             domain = getEmailDomain(email);
         }
