@@ -49,7 +49,8 @@ It may happen that I remove older packages without prior notice, because the sto
 ### Configure email domains
 
 Email domains can be configured per identity provider. Currently, this can only be achieved via [Identity Providers REST API](https://www.keycloak.org/docs-api/18.0/rest-api/index.html#_identity_providers_resource). Make sure to post the full body, as you may receive from a `GET` request to the same endpoint, plus the `home.idp.discovery.domains` configuration.
-```json
+
+```
 PUT /{realm}/identity-provider/instances/{alias}
 {
   ...
@@ -68,7 +69,16 @@ You can also use the [Admin CLI (kcadm)](https://www.keycloak.org/docs/latest/se
 kcadm.sh update identity-provider/instances/{alias} -s 'config."home.idp.discovery.domains"="example.com##example.net"'
 ```
 
+### Add Authenticator Execution
+
+* Navigate to `Authentication`
+* Create a custom `Browser` flow
+* Click `Add execution`
+* Select `Home IdP Discovery`
+
 ### Configuration options
+
+To configure click: `Actions > Config`
 
 ![Authenticator configuration](docs/images/authenticator-config.jpg)
 
