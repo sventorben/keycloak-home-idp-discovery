@@ -155,7 +155,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         if (user == null || !config.forwardToLinkedIdp()) {
             linkedIdps = Collections.emptyMap();
         } else {
-            linkedIdps = context.getSession().userLocalStorage()
+            linkedIdps = context.getSession().users()
                 .getFederatedIdentitiesStream(context.getRealm(), user)
                 .collect(
                     Collectors.toMap(FederatedIdentityModel::getIdentityProvider, FederatedIdentityModel::getUserName));

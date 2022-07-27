@@ -1,4 +1,9 @@
-* Update Keycloak dependencies to 18.0.2
+* Update Keycloak dependencies to 19.0.0
+
+> ⚠️ **Compatibility issues**:
+>
+> Due to changes in the `KeycloakSession` this extension will no longer be backwards compatible with Keycloak versions < 19.x.
+> For details please see https://www.keycloak.org/2022/07/keycloak-1900-released#_changes_in_keycloaksession
 
 > ⚠️ **Production readiness**:
 >
