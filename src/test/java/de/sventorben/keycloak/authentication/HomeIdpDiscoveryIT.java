@@ -171,29 +171,30 @@ class HomeIdpDiscoveryIT {
     }
 
     private void setForwarding(Boolean enabled) {
-        Keycloak admin = getKeycloakAdminClient();
-        AuthenticationManagementResource flows = admin.realm(REALM_TEST).flows();
-        AuthenticationExecutionInfoRepresentation execution = flows
-            .getExecutions("discover home idp").stream()
-            .filter(it -> it.getProviderId().equalsIgnoreCase("home-idp-discovery"))
-            .findFirst()
-            .get();
-        String authenticationConfigId = execution.getAuthenticationConfig();
-        AuthenticatorConfigRepresentation authenticatorConfig;
-        String authenticatorConfigAlias = "home-idp-discovery-flow-config";
-        if (authenticationConfigId == null) {
-            authenticatorConfig = new AuthenticatorConfigRepresentation();
-            authenticatorConfig.setAlias(authenticatorConfigAlias);
-            Response response = flows.newExecutionConfig(execution.getId(), authenticatorConfig);
-            String location = response.getHeaderString("Location");
-            authenticationConfigId = location.substring(location.lastIndexOf("/") + 1);
-        } else {
-            authenticatorConfig = flows.getAuthenticatorConfig(authenticationConfigId);
+        try(Keycloak admin = getKeycloakAdminClient()) {
+            AuthenticationManagementResource flows = admin.realm(REALM_TEST).flows();
+            AuthenticationExecutionInfoRepresentation execution = flows
+                .getExecutions("discover home idp").stream()
+                .filter(it -> it.getProviderId().equalsIgnoreCase("home-idp-discovery"))
+                .findFirst()
+                .get();
+            String authenticationConfigId = execution.getAuthenticationConfig();
+            AuthenticatorConfigRepresentation authenticatorConfig;
+            String authenticatorConfigAlias = "home-idp-discovery-flow-config";
+            if (authenticationConfigId == null) {
+                authenticatorConfig = new AuthenticatorConfigRepresentation();
+                authenticatorConfig.setAlias(authenticatorConfigAlias);
+                Response response = flows.newExecutionConfig(execution.getId(), authenticatorConfig);
+                String location = response.getHeaderString("Location");
+                authenticationConfigId = location.substring(location.lastIndexOf("/") + 1);
+            } else {
+                authenticatorConfig = flows.getAuthenticatorConfig(authenticationConfigId);
+            }
+            Map<String, String> config = authenticatorConfig.getConfig();
+            config.put("forwardToLinkedIdp", enabled.toString());
+            authenticatorConfig.setConfig(config);
+            flows.updateAuthenticatorConfig(authenticationConfigId, authenticatorConfig);
         }
-        Map<String, String> config = authenticatorConfig.getConfig();
-        config.put("forwardToLinkedIdp", enabled.toString());
-        authenticatorConfig.setConfig(config);
-        flows.updateAuthenticatorConfig(authenticationConfigId, authenticatorConfig);
     }
 
     private static Keycloak getKeycloakAdminClient() {

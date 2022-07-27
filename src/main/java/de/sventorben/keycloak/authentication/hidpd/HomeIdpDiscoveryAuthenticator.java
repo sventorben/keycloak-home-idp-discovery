@@ -142,7 +142,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
                 LOG.tracef("Could not find home IdP for domain %s and user %s", domain, username);
             }
         } else {
-            LOG.warnf("Could not extract domain from email address %s",username);
+            LOG.warnf("Could not extract domain from email address %s", username);
         }
 
         return homeIdp;
