@@ -180,7 +180,7 @@
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxb-provider</artifactId>
-                <version>4.7.4.Final</version>
+                <version>6.0.3.Final</version>
                 <scope>test</scope>
             </dependency>
 
