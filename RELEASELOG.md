@@ -1,4 +1,4 @@
-* Update Keycloak dependencies to 19.0.0
+* Update Keycloak dependencies to 19.0.1
 
 > ⚠️ **Compatibility issues**:
 >
