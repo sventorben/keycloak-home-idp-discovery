@@ -87,6 +87,9 @@ To configure click: `Actions > Config`
 | Forward to linked IdP | If switched on, federated users (with already linked IdPs) will be forwarded to a linked IdP even if no IdP has been configured for the user's email address. Federated users can also use their local username for login instead of their email address.<br><br> If switched off, users will only be forwarded to IdPs with matching email domains. |
 
 ### Show configured email domains in Admin console
+
+:warning: Please not that this currently only works with the old admin console. Please see https://github.com/sventorben/keycloak-home-idp-discovery/issues/86 for details.
+
 * Navigate to `Realm Settings`
 * Click `Themes` tab
 * Choose `home-idp-discovery` for the `Admin Console Theme`
