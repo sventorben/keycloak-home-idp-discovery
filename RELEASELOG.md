@@ -1,4 +1,5 @@
-* Update Keycloak dependencies to 19.0.1
+* [deps] Update Keycloak dependencies to 19.0.1
+* [feat] Support custom user attribute to lookup email address. <br>This may be useful if you want to redirect users based on their User Principal Name (UPN) instead of their email address.
 
 > ⚠️ **Compatibility issues**:
 >

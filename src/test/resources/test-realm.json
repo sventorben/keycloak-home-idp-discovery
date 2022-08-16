@@ -167,7 +167,10 @@
     "requiredActions" : [ ],
     "realmRoles" : [ "default-roles-test-realm" ],
     "notBefore" : 0,
-    "groups" : [ ]
+    "groups" : [ ],
+    "attributes" : {
+        "UPN" : ["test4@example.com"]
+    }
   }, {
       "id" : "139020a3-4459-43b1-a92f-d90e5cf093a5",
       "createdTimestamp" : 1632070461116,

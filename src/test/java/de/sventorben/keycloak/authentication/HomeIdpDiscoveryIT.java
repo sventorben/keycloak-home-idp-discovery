@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.time.Duration;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -85,6 +86,7 @@ class HomeIdpDiscoveryIT {
     @BeforeEach
     public void gotoLoginPage() {
         webDriver = setupDriver();
+        resetAuthenticatorConfig();
         accountConsolePage().signIn();
     }
 
@@ -110,6 +112,13 @@ class HomeIdpDiscoveryIT {
     public void doNotRedirectIfUserEmailIsNotVerified() {
         testRealmLoginPage().signIn("test4@example.com");
         assertNotRedirected();
+    }
+
+    @Test
+    public void redirectIfUserHasDomainAsPartOfCustomUserAttribute() {
+        setUserAttribute("UPN");
+        testRealmLoginPage().signIn("test4@example.com");
+        assertRedirectedToIdp();
     }
 
     @Nested
@@ -170,7 +179,28 @@ class HomeIdpDiscoveryIT {
         setForwarding(false);
     }
 
+    private void setUserAttribute(String userAttribute) {
+        updateAuthenticatorConfig(authenticatorConfig -> {
+            Map<String, String> config = authenticatorConfig.getConfig();
+            config.put("userAttribute", userAttribute);
+            authenticatorConfig.setConfig(config);
+        });
+    }
+
     private void setForwarding(Boolean enabled) {
+        updateAuthenticatorConfig(authenticatorConfig -> {
+            Map<String, String> config = authenticatorConfig.getConfig();
+            config.put("forwardToLinkedIdp", enabled.toString());
+            authenticatorConfig.setConfig(config);
+        });
+    }
+
+    private void resetAuthenticatorConfig() {
+        disableForwarding();
+        setUserAttribute("email");
+    }
+
+    private void updateAuthenticatorConfig(Consumer<AuthenticatorConfigRepresentation> configurer) {
         try(Keycloak admin = getKeycloakAdminClient()) {
             AuthenticationManagementResource flows = admin.realm(REALM_TEST).flows();
             AuthenticationExecutionInfoRepresentation execution = flows
@@ -190,9 +220,7 @@ class HomeIdpDiscoveryIT {
             } else {
                 authenticatorConfig = flows.getAuthenticatorConfig(authenticationConfigId);
             }
-            Map<String, String> config = authenticatorConfig.getConfig();
-            config.put("forwardToLinkedIdp", enabled.toString());
-            authenticatorConfig.setConfig(config);
+            configurer.accept(authenticatorConfig);
             flows.updateAuthenticatorConfig(authenticationConfigId, authenticatorConfig);
         }
     }

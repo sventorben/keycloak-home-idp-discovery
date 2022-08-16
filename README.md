@@ -82,9 +82,10 @@ To configure click: `Actions > Config`
 
 ![Authenticator configuration](docs/images/authenticator-config.jpg)
 
-| Option | Description |
-| --- | --- |
-| Forward to linked IdP | If switched on, federated users (with already linked IdPs) will be forwarded to a linked IdP even if no IdP has been configured for the user's email address. Federated users can also use their local username for login instead of their email address.<br><br> If switched off, users will only be forwarded to IdPs with matching email domains. |
+| Option                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Forward to linked IdP | If switched on, federated users (with already linked IdPs) will be forwarded to a linked IdP even if no IdP has been configured for the user's email address. Federated users can also use their local username for login instead of their email address.<br><br> If switched off, users will only be forwarded to IdPs with matching email domains.                                                                                                                                                    |
+| User attribute        | The user attribute used to lookup the user's email address.<br><br>If set to `email` the authenticator will use the default email property. In this case the authenticator will only forward the user if the email has been verified. For any other attribute, the authenticator will not validate if the email has been verified. <br><br> A common use case is to store a User Principal Name (UPN) in a custom attribute and forward users based on the UPN instead instead of their email address.  |
 
 ### Show configured email domains in Admin console
 

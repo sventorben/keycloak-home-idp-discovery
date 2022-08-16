@@ -8,7 +8,12 @@ import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAu
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
-import org.keycloak.models.*;
+import org.keycloak.models.FederatedIdentityModel;
+import org.keycloak.models.IdentityProviderModel;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.ModelDuplicateException;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.services.managers.AuthenticationManager;
@@ -62,9 +67,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             return;
         }
 
-        UserModel user = context.getUser();
-
-        final Optional<IdentityProviderModel> homeIdp = discoverHomeIdp(context, user, username);
+        final Optional<IdentityProviderModel> homeIdp = discoverHomeIdp(context, username);
 
         if (homeIdp.isEmpty()) {
             context.attempted();
@@ -124,15 +127,16 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         return context.getRealm().isLoginWithEmailAllowed() ? "invalidUsernameOrEmailMessage" : "invalidUsernameMessage";
     }
 
-    private static Optional<IdentityProviderModel> discoverHomeIdp(AuthenticationFlowContext context, UserModel user, String username) {
-
+    private static Optional<IdentityProviderModel> discoverHomeIdp(AuthenticationFlowContext context, String username) {
         Optional<IdentityProviderModel> homeIdp = Optional.empty();
 
         final Optional<String> emailDomain;
+        UserModel user = context.getUser();
         if (user == null) {
             emailDomain = getEmailDomain(username);
         } else {
-            emailDomain = getEmailDomain(user);
+            HomeIdpDiscoveryConfig config = new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig());
+            emailDomain = getEmailDomain(user, config);
         }
 
         if (emailDomain.isPresent()) {
@@ -197,13 +201,21 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         return homeIdp;
     }
 
-    private static Optional<String> getEmailDomain(UserModel user) {
-        Optional<String> domain = Optional.empty();
-        if (user.isEnabled() && user.isEmailVerified()) {
-            String email = user.getEmail();
-            domain = getEmailDomain(email);
+    private static Optional<String> getEmailDomain(UserModel user, HomeIdpDiscoveryConfig config) {
+        if (!user.isEnabled()) {
+            LOG.debugf("User %s not enabled", user.getId());
+            return Optional.empty();
         }
-        return domain;
+        String userAttribute = user.getFirstAttribute(config.userAttribute());
+        if (userAttribute == null) {
+            LOG.debugf("Could not find user attribute %s for user %s", config.userAttribute(), user.getId());
+            return Optional.empty();
+        }
+        if ("email".equalsIgnoreCase(config.userAttribute()) && !user.isEmailVerified()) {
+            LOG.debugf("Email of user %s not verified", user.getId());
+            return Optional.empty();
+        }
+        return getEmailDomain(userAttribute);
     }
 
     private static Optional<String> getEmailDomain(String email) {

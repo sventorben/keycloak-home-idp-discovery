@@ -7,6 +7,7 @@ import java.util.Optional;
 final class HomeIdpDiscoveryConfig {
 
     static final String FORWARD_TO_LINKED_IDP = "forwardToLinkedIdp";
+    static final String USER_ATTRIBUTE = "userAttribute";
 
     private final AuthenticatorConfigModel authenticatorConfigModel;
 
@@ -18,5 +19,11 @@ final class HomeIdpDiscoveryConfig {
         return Optional.ofNullable(authenticatorConfigModel)
             .map(it -> Boolean.parseBoolean(it.getConfig().getOrDefault(FORWARD_TO_LINKED_IDP, "false")))
             .orElse(false);
+    }
+
+    String userAttribute() {
+        return Optional.ofNullable(authenticatorConfigModel)
+            .map(it -> it.getConfig().getOrDefault(USER_ATTRIBUTE, "email").trim())
+            .orElse("email");
     }
 }
