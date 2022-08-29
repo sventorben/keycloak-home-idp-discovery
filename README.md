@@ -46,6 +46,30 @@ It may happen that I remove older packages without prior notice, because the sto
 
 ## How to configure?
 
+### Add Authenticator Execution
+
+* Navigate to `Authentication`
+* Create a custom `Basic` flow
+* Click `Add execution`
+* Select `Home IdP Discovery` and add the execution
+* Set execution as required or alternative as desired
+* Bind your newly created flow as desired - either as a default for the whole realm or on a per-client basis.
+
+See the image below for an example:
+
+![Example flow](docs/images/flow.jpg)
+
+### Configuration options
+
+To configure click settings/gear icon (&#9881;)
+
+![Authenticator configuration](docs/images/authenticator-config.jpg)
+
+| Option                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Forward to linked IdP | If switched on, federated users (with already linked IdPs) will be forwarded to a linked IdP even if no IdP has been configured for the user's email address. Federated users can also use their local username for login instead of their email address.<br><br> If switched off, users will only be forwarded to IdPs with matching email domains.                                                                                                                                                    |
+| User attribute        | The user attribute used to lookup the user's email address.<br><br>If set to `email` the authenticator will use the default email property. In this case the authenticator will only forward the user if the email has been verified. For any other attribute, the authenticator will not validate if the email has been verified. <br><br> A common use case is to store a User Principal Name (UPN) in a custom attribute and forward users based on the UPN instead instead of their email address.  |
+
 ### Configure email domains
 
 Email domains can be configured per identity provider. Currently, this can only be achieved via [Identity Providers REST API](https://www.keycloak.org/docs-api/19.0/rest-api/index.html#_identity_providers_resource). Make sure to post the full body, as you may receive from a `GET` request to the same endpoint, plus the `home.idp.discovery.domains` configuration.
@@ -69,25 +93,38 @@ You can also use the [Admin CLI (kcadm)](https://www.keycloak.org/docs/latest/se
 kcadm.sh update identity-provider/instances/{alias} -s 'config."home.idp.discovery.domains"="example.com##example.net"'
 ```
 
-### Add Authenticator Execution
+#### Multiple authenticator instances
+If you use multiple authenticator instances each using a different user attribute, you can specify different domains per user attribute as well.
+For this to work, simply add a config key `home.idp.discovery.domains.<attribute_name>` where `<attribute_name>` is the name of the attribute you are using.
 
-* Navigate to `Authentication`
-* Create a custom `Browser` flow
-* Click `Add execution`
-* Select `Home IdP Discovery`
+For example, when using a custom user attribute named `upn`, add a key named `home.idp.discovery.domains.upn`.
+The authenticator will try to look up the specific key `home.idp.discovery.domains.<attribute_name>` first and fallback to `home.idp.discovery.domains` if the specific key does not exist.
 
-### Configuration options
+```
+PUT /{realm}/identity-provider/instances/{alias}
+{
+  ...
+  "config": {
+    "home.idp.discovery.domains": "example.com##example.net",
+    "home.idp.discovery.domains.upn": "enterprise.local",
+    "home.idp.discovery.domains.email": "example.org",
+    ...
+  },
+  ...
+}
+```
 
-To configure click: `Actions > Config`
+In the example above, the following domains will be effective when using the configured attribute name:
 
-![Authenticator configuration](docs/images/authenticator-config.jpg)
+| configured attribute name | effective domains        |
+|---------------------------|--------------------------|
+| email                     | example.org              |
+| upn                       | enterprise.local         |
+| notconfigured             | example.com, example.net |
 
-| Option                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Forward to linked IdP | If switched on, federated users (with already linked IdPs) will be forwarded to a linked IdP even if no IdP has been configured for the user's email address. Federated users can also use their local username for login instead of their email address.<br><br> If switched off, users will only be forwarded to IdPs with matching email domains.                                                                                                                                                    |
-| User attribute        | The user attribute used to lookup the user's email address.<br><br>If set to `email` the authenticator will use the default email property. In this case the authenticator will only forward the user if the email has been verified. For any other attribute, the authenticator will not validate if the email has been verified. <br><br> A common use case is to store a User Principal Name (UPN) in a custom attribute and forward users based on the UPN instead instead of their email address.  |
+Please note that the lookup is case-insensitive, so `email` will be the same as `Email` or `EMAIL`.
 
-### Show configured email domains in Admin console
+## Show configured email domains in Admin console
 
 :warning: Please not that this currently only works with the old admin console. Please see https://github.com/sventorben/keycloak-home-idp-discovery/issues/86 for details.
 
