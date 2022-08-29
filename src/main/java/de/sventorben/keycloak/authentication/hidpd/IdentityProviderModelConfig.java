@@ -4,7 +4,6 @@ import org.keycloak.models.Constants;
 import org.keycloak.models.IdentityProviderModel;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.stream.Stream;
 
 final class IdentityProviderModelConfig {
@@ -21,8 +20,13 @@ final class IdentityProviderModelConfig {
         return getDomains(userAttributeName).anyMatch(domain::equalsIgnoreCase);
     }
 
-    @Deprecated(forRemoval = true)
-    Stream<String> getDomains(String userAttributeName) {
+    private Stream<String> getDomains(String userAttributeName) {
+        String key = getDomainConfigKey(userAttributeName);
+        String domainsAttribute = identityProviderModel.getConfig().getOrDefault(key, "");
+        return Arrays.stream(Constants.CFG_DELIMITER_PATTERN.split(domainsAttribute));
+    }
+
+    private String getDomainConfigKey(String userAttributeName) {
         String key = DOMAINS_ATTRIBUTE_KEY;
         if (userAttributeName != null) {
             final String candidateKey = DOMAINS_ATTRIBUTE_KEY + "." + userAttributeName;
@@ -30,15 +34,7 @@ final class IdentityProviderModelConfig {
                 key = candidateKey;
             }
         }
-
-        String domainsAttribute = identityProviderModel.getConfig().getOrDefault(key, "");
-
-        return Arrays.stream(Constants.CFG_DELIMITER_PATTERN.split(domainsAttribute));
+        return key;
     }
 
-    @Deprecated(forRemoval = true)
-    void setDomains(Collection<String> domains) {
-        String domainsAttributeValue = String.join(Constants.CFG_DELIMITER, domains);
-        identityProviderModel.getConfig().put(DOMAINS_ATTRIBUTE_KEY, domainsAttributeValue);
-    }
 }

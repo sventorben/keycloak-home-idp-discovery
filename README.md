@@ -57,7 +57,7 @@ It may happen that I remove older packages without prior notice, because the sto
 
 See the image below for an example:
 
-![Example flow](docs/images/flow.jpg)
+![Example flow](docs/images/flow.JPG)
 
 ### Configuration options
 
