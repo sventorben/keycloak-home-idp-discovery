@@ -146,7 +146,7 @@ Yes it does!
 Please note that with the release of Keycloak 17.0.0 the Quarkus-based distro (aka Keycloak.X) is now fully supported by the Keycloak team.
 Hence, I dropped support for the Wildfly-based distro already. Though this library may still work with the Wildfly-based distro, I will no longer put any efforts into keeping this extension compatible.
 
-### Does it work with the legady Wildfly-based Keycloak distro?
+### Does it work with the legacy Wildfly-based Keycloak distro?
 Maybe! There is even a high chance it will, since this extension does not make use of any Quarkus-related functionality.
 For installation instructions, please refer to an [older version of this readme](https://github.com/sventorben/keycloak-home-idp-discovery/blob/v16.0.0/README.md).
 
