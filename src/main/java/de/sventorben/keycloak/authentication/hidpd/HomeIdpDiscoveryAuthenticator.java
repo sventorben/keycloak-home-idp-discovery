@@ -168,7 +168,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         // enabled IdPs with domain
         List<IdentityProviderModel> idpsWithDomain = context.getRealm().getIdentityProvidersStream()
             .filter(IdentityProviderModel::isEnabled)
-            .filter(it -> new IdentityProviderModelConfig(it).hasDomain(domain))
+            .filter(it -> new IdentityProviderModelConfig(it).hasDomain(config.userAttribute(), domain))
             .collect(Collectors.toList());
 
         // Linked IdPs with matching domain

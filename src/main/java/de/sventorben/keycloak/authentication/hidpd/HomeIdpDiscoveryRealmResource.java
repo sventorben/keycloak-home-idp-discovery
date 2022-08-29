@@ -50,7 +50,7 @@ public final class HomeIdpDiscoveryRealmResource {
         } else {
             IdpConfig idpConfig = new IdpConfig();
             IdentityProviderModelConfig config = new IdentityProviderModelConfig(idp);
-            idpConfig.setDomains(config.getDomains().collect(Collectors.toList()));
+            idpConfig.setDomains(config.getDomains(null).collect(Collectors.toList()));
             responseBuilder = Response.ok(idpConfig);
         }
 
@@ -70,7 +70,7 @@ public final class HomeIdpDiscoveryRealmResource {
             responseBuilder = Response.status(Response.Status.NOT_FOUND);
         } else {
             IdentityProviderModelConfig config = new IdentityProviderModelConfig(idp);
-            config.setDomains(config.getDomains().collect(Collectors.toList()));
+            config.setDomains(idpConfig.getDomains());
             responseBuilder = Response.status(Response.Status.NO_CONTENT);
         }
 
