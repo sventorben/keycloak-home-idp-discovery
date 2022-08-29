@@ -6,6 +6,7 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
 
+@Deprecated(forRemoval = true)
 public final class HomeIdpDiscoveryRealmResourceProviderFactory implements RealmResourceProviderFactory {
 
     private static final String PROVIDER_ID = "home-idp-discovery";

@@ -5,6 +5,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
+@Deprecated(forRemoval = true)
 final class HomeIdpDiscoveryRealmResourceProvider implements RealmResourceProvider {
 
     private final KeycloakSession session;

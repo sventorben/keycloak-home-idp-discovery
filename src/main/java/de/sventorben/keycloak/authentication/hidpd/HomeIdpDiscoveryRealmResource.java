@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.*;
 
+@Deprecated(forRemoval = true)
 public final class HomeIdpDiscoveryRealmResource {
 
     @Context
