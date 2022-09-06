@@ -37,6 +37,19 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+        String attemptedUsername = getAttemptedUsername(context);
+        if (attemptedUsername == null) {
+            challenge(context);
+        } else {
+            LOG.info("Found attempted username from previous authenticator, skipping login form");
+        }
+    }
+
+    private String getAttemptedUsername(AuthenticationFlowContext context) {
+        return trimToNull(context.getAuthenticationSession().getAuthNote(ATTEMPTED_USERNAME));
+    }
+
+    private void challenge(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = new MultivaluedMapImpl<>();
         String loginHint = context.getAuthenticationSession().getClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM);
 
@@ -79,12 +92,11 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
     private String setUserInContext(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
         context.clearUser();
 
-        String username = inputData.getFirst(AuthenticationManager.FORM_USERNAME);
+        String username = trimToNull(inputData.getFirst(AuthenticationManager.FORM_USERNAME));
 
-        if (username != null) {
-            username = username.trim();
-            if ("".equalsIgnoreCase(username))
-                username = null;
+        if(username == null) {
+            LOG.info("Could not find username in request. Trying attempted username from previous authenticator");
+            username = getAttemptedUsername(context);
         }
 
         if (username == null) {
@@ -109,7 +121,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         return username;
     }
 
-    protected Response challenge(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
+    private Response challenge(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
         LoginFormsProvider forms = context.form();
         if (!formData.isEmpty()) {
             forms.setFormData(formData);
@@ -230,6 +242,15 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             }
         }
         return Optional.ofNullable(domain);
+    }
+
+    private static String trimToNull(final String string) {
+        if (string == null) {
+            return null;
+        }
+        String trimmed = string.trim();
+        if ("".equalsIgnoreCase(trimmed)) trimmed = null;
+        return trimmed;
     }
 
     @Override
