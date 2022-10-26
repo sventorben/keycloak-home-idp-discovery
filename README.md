@@ -126,8 +126,9 @@ Please note that the lookup is case-insensitive, so `email` will be the same as 
 
 ## Show configured email domains in Admin console
 
-:warning: Please not that this currently only works with the old admin console. Please see https://github.com/sventorben/keycloak-home-idp-discovery/issues/86 for details.
+:warning: Please note that this currently only works with the old admin console. Please see https://github.com/sventorben/keycloak-home-idp-discovery/issues/86 for details.
 
+* Open `master` realm
 * Navigate to `Realm Settings`
 * Click `Themes` tab
 * Choose `home-idp-discovery` for the `Admin Console Theme`
