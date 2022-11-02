@@ -4,7 +4,6 @@ This is a simple Keycloak authenticator to redirect users to their home identity
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sventorben/keycloak-home-idp-discovery?sort=semver)
 ![Keycloak Dependency Version](https://img.shields.io/badge/Keycloak-20.0.0-blue)
-![Keycloak.X ready](https://img.shields.io/badge/%E2%AD%90%20Keycloak.X%20%E2%AD%90-ready%20-blue)
 ![GitHub Release Date](https://img.shields.io/github/release-date-pre/sventorben/keycloak-home-idp-discovery)
 ![Github Last Commit](https://img.shields.io/github/last-commit/sventorben/keycloak-home-idp-discovery)
 
@@ -141,15 +140,12 @@ Please note that the lookup is case-insensitive, so `email` will be the same as 
 
 ## Frequently asked questions
 
-### Does it (already) work with Quarkus/Keycloak.X?
-Yes it does!
-
-Please note that with the release of Keycloak 17.0.0 the Quarkus-based distro (aka Keycloak.X) is now fully supported by the Keycloak team.
-Hence, I dropped support for the Wildfly-based distro already. Though this library may still work with the Wildfly-based distro, I will no longer put any efforts into keeping this extension compatible.
-
 ### Does it work with the legacy Wildfly-based Keycloak distro?
 Maybe! There is even a high chance it will, since this extension does not make use of any Quarkus-related functionality.
 For installation instructions, please refer to an [older version of this readme](https://github.com/sventorben/keycloak-home-idp-discovery/blob/v16.0.0/README.md).
+
+Please note that with the release of Keycloak 20.0.0 the Wildfly-based distro is no longer supported.
+Hence, I dropped support for the Wildfly-based distro already. Though this library may still work with the Wildfly-based distro, I will no longer put any efforts into keeping this extension compatible.
 
 ### Does it work with Keycloak version X.Y.Z?
 
