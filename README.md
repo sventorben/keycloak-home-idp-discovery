@@ -142,7 +142,7 @@ When you configured this authenticator as an alternative to other authenticators
 
 When clicking that link, the user can select the login method based on configured alternative authenticators.
 
-![Select login method dialog](docs/images/sing-in-to-your-account.jpg)
+![Select login method dialog](docs/images/select-login-method.jpg)
 
 You can change the title and help text for this authenticator by adding the following messages to your custom theme:
 
