@@ -191,5 +191,5 @@ I do not guarantee what version `a.b` or `y.z` will be. Neither do I backport fe
 ### User is not redirected to the correct identity provider. How to analyze the problem?
 
 You may want to increase the log level to see more fine grained information on how the authenticator discovered the home identity provider.
-Try to increase the log level to `DEBUG` or event `TRACE` level. Details can be found in the offical [Configuring logging](https://www.keycloak.org/server/logging) guide.
+Try to increase the log level to `DEBUG` or even `TRACE` level. Details can be found in the offical [Configuring logging](https://www.keycloak.org/server/logging) guide.
 The log category for the authenticator is `de.sventorben.keycloak.authentication.hidpd`.
