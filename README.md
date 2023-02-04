@@ -133,7 +133,29 @@ In the example above, the following domains will be effective when using the con
 
 Please note that the lookup is case-insensitive, so `email` will be the same as `Email` or `EMAIL`.
 
-## Show configured email domains in Admin console
+## Themes
+
+### Customized messages for select login options dialog
+When you configured this authenticator as an alternative to other authenticators, Keycloak may show a link "Try Another Way" durin login as shown below:
+
+![Sign in to your account dialog with "try another way" link](docs/images/sing-in-to-your-account.jpg)
+
+When clicking that link, the user can select the login method based on configured alternative authenticators.
+
+![Select login method dialog](docs/images/sing-in-to-your-account.jpg)
+
+You can change the title and help text for this authenticator by adding the following messages to your custom theme:
+
+```properties
+home-idp-discovery-display-name=Home identity provider
+home-idp-discovery-help-text=Sign in via your home identity provider which will be automatically determined based on your provided email address.
+```
+
+This also supports for internationalization and you can add additional languages or locales as needed.
+
+Please see the [Server Developer guide](https://www.keycloak.org/docs/latest/server_development/#messages) for detailed information.
+
+### Show configured email domains in Admin console
 
 :warning: Please note that this currently only works with the old admin console. Please see https://github.com/sventorben/keycloak-home-idp-discovery/issues/86 for details.
 
