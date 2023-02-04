@@ -18,16 +18,16 @@ final class DomainExtractor {
 
     Optional<String> extractFrom(UserModel user) {
         if (!user.isEnabled()) {
-            LOG.debugf("User %s not enabled", user.getId());
+            LOG.warnf("User '%s' not enabled", user.getId());
             return Optional.empty();
         }
         String userAttribute = user.getFirstAttribute(config.userAttribute());
         if (userAttribute == null) {
-            LOG.debugf("Could not find user attribute %s for user %s", config.userAttribute(), user.getId());
+            LOG.warnf("Could not find user attribute '%s' for user '%s'", config.userAttribute(), user.getId());
             return Optional.empty();
         }
         if (EMAIL_ATTRIBUTE.equalsIgnoreCase(config.userAttribute()) && !user.isEmailVerified()) {
-            LOG.debugf("Email of user %s not verified", user.getId());
+            LOG.warnf("Email address of user '%s' is not verified", user.getId());
             return Optional.empty();
         }
         return extractFrom(userAttribute);

@@ -38,12 +38,14 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
     public void action(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
+            LOG.debugf("Login canceled");
             context.cancelLogin();
             return;
         }
 
         String username = setUserInContext(context, formData);
         if (username == null) {
+            LOG.debugf("No username in request");
             return;
         }
 
@@ -68,12 +70,14 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         }
 
         if (username == null) {
+            LOG.warn("No or empty username found in request");
             context.getEvent().error(Errors.USER_NOT_FOUND);
             Response challengeResponse = challenge(context, getDefaultChallengeMessage(context), FIELD_USERNAME);
             context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
             return null;
         }
 
+        LOG.debugf("Found username '%s' in request", username);
         context.getEvent().detail(Details.USERNAME, username);
         context.getAuthenticationSession().setAuthNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME, username);
         context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, username);
@@ -82,10 +86,11 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             UserModel user = KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(),
                 username);
             if (user != null) {
+                LOG.tracef("Setting user '%s' in context", user.getId());
                 context.setUser(user);
             }
         } catch (ModelDuplicateException ex) {
-            LOG.debugf(ex, "Could not find user %s", username);
+            LOG.warnf(ex, "Could not uniquely identify the user. Multiple users with name or email '%s' found.", username);
         }
 
         return username;
