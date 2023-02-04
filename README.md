@@ -18,7 +18,17 @@ This authenticator allows to skip the step of selecting an identity provider.
 ## How does it work?
 
 If this authenticator gets configured as part of a browser based login flow, Keycloak will present a username form (without password form and without list of configured identity providers).
-A user can then enter an email address. Keycloak will then choose an identity provider based on the provided email domain and forward the user to the chosen provider.
+A user can then enter an email address. Keycloak will then choose an identity provider based on the domain part of the provided email address and forward the user to the chosen provider.
+
+The identity provider will be chosen by the following preference:
+1. If the `forwardToLinkedIdp` config option is enabled
+   1. Use a first linked identity provider with matching domain
+   2. Use a first linked identity provider
+   3. Use non-linked identity provider with matching domain
+2. If the `forwadToLinkedIdp` config option is disabled
+   1. Use the first identity provider with matching domain
+
+Only enabled identity providers will be considered.
 
 ## How to install?
 
