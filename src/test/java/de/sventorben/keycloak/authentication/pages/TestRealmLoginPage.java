@@ -22,6 +22,9 @@ public class TestRealmLoginPage {
     @FindBy(css = "input[id='kc-login']")
     private WebElement signInButton;
 
+    @FindBy(css = "a[id='try-another-way']")
+    private WebElement tryAnotherWayLink;
+
     public TestRealmLoginPage(WebDriver webDriver, String keycloakBaseUrl) {
         this.webDriver = webDriver;
         this.keycloakBaseUrl = keycloakBaseUrl;
@@ -33,6 +36,11 @@ public class TestRealmLoginPage {
         new WebDriverWait(webDriver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOf(usernameInput));
         usernameInput.sendKeys(username);
         signInButton.click();
+    }
+
+    public void tryAnotherWay() {
+        new WebDriverWait(webDriver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOf(tryAnotherWayLink));
+        tryAnotherWayLink.click();
     }
 
 }
