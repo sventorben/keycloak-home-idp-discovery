@@ -2,6 +2,7 @@ package de.sventorben.keycloak.authentication.hidpd;
 
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
+import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.FederatedIdentityModel;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.RealmModel;
@@ -25,7 +26,7 @@ final class HomeIdpDiscoverer {
         this(new DomainExtractor(new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig())), context);
     }
 
-    HomeIdpDiscoverer(DomainExtractor domainExtractor, AuthenticationFlowContext context) {
+    private HomeIdpDiscoverer(DomainExtractor domainExtractor, AuthenticationFlowContext context) {
         this.domainExtractor = domainExtractor;
         this.context = context;
     }
@@ -33,9 +34,10 @@ final class HomeIdpDiscoverer {
     public Optional<IdentityProviderModel> discoverForUser(String username) {
 
         String realmName = context.getRealm().getName();
+        AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
         LOG.tracef(
             "Trying to discover home IdP for username '%s' in realm '%s' with authenticator config '%s'",
-            username, realmName, context.getAuthenticatorConfig().getAlias());
+            username, realmName, authenticatorConfig == null ? "<unconfigured>" : authenticatorConfig.getAlias());
 
         Optional<IdentityProviderModel> homeIdp = Optional.empty();
 
