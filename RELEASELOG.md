@@ -1,6 +1,8 @@
-* [deps] Update Keycloak dependencies to 21.0.0
+* [!refactor] Remove home-idp-discovery theme
 
-> ⚠️ **Compatibility issues**:
+> ⚠️ **Removal of admin theme**:
 >
-> This and all upcoming releases will no longer be backwards compatible with Keycloak versions < 21
+> With Keycloak versions > 21 the old admin theme has been removed after  it had been deprecated since version 19.  Hence, the theme would no longer work anyways.
+> Please track issue ([#86][i86]) for updates.
 
+[i86]: https://github.com/sventorben/keycloak-home-idp-discovery/issues/86

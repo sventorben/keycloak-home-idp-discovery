@@ -155,21 +155,6 @@ This also supports for internationalization and you can add additional languages
 
 Please see the [Server Developer guide](https://www.keycloak.org/docs/latest/server_development/#messages) for detailed information.
 
-### Show configured email domains in Admin console
-
-:warning: Please note that this currently only works with the old admin console. Please see https://github.com/sventorben/keycloak-home-idp-discovery/issues/86 for details.
-
-* Open `master` realm
-* Navigate to `Realm Settings`
-* Click `Themes` tab
-* Choose `home-idp-discovery` for the `Admin Console Theme`
-* Click `Save`
-* Reload the admin console (press F5 in your browser)
-* Navigate to an identity provider
-* Click `Home IdP Discovery` tab
-
-![View email domains](docs/images/view-idp-email-domains.jpg)
-
 ## Frequently asked questions
 
 ### Does it work with the legacy Wildfly-based Keycloak distro?
