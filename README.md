@@ -173,8 +173,10 @@ Authenticator version `X.b.c` is compiled against Keycloak version `X.y.z`. For 
 
 I do not guarantee what version `a.b` or `y.z` will be. Neither do I backport features to older version, nor maintain any older versions of this authenticator. If you need the latest features or bugfixes for an older version, please fork this project or update your Keycloak instance. I recommend doing the latter on regular basis anyways.
 
-### User is not redirected to the correct identity provider. How to analyze the problem?
+### User does not get redirected, but only sees a password form instead.
+Make sure that your users email is marked as verified. You can enable the `Email verified` flag per user or switch on `Trust Email` in the advanced settings of the identity provider.
 
+### User is not redirected to the correct identity provider. How to analyze the problem?
 You may want to increase the log level to see more fine grained information on how the authenticator discovered the home identity provider.
 Try to increase the log level to `DEBUG` or even `TRACE` level. Details can be found in the offical [Configuring logging](https://www.keycloak.org/server/logging) guide.
 The log category for the authenticator is `de.sventorben.keycloak.authentication.hidpd`.
