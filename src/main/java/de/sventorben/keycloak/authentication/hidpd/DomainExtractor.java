@@ -10,7 +10,7 @@ final class DomainExtractor {
     private static final Logger LOG = Logger.getLogger(DomainExtractor.class);
     private static final String EMAIL_ATTRIBUTE = "email";
 
-    private HomeIdpDiscoveryConfig config;
+    private final HomeIdpDiscoveryConfig config;
 
     DomainExtractor(HomeIdpDiscoveryConfig config) {
         this.config = config;

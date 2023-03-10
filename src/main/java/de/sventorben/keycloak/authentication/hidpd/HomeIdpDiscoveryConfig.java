@@ -7,6 +7,7 @@ import java.util.Optional;
 final class HomeIdpDiscoveryConfig {
 
     static final String FORWARD_TO_LINKED_IDP = "forwardToLinkedIdp";
+    static final String BYPASS_LOGIN_PAGE = "bypassLoginPage";
     static final String USER_ATTRIBUTE = "userAttribute";
 
     private final AuthenticatorConfigModel authenticatorConfigModel;
@@ -18,6 +19,12 @@ final class HomeIdpDiscoveryConfig {
     boolean forwardToLinkedIdp() {
         return Optional.ofNullable(authenticatorConfigModel)
             .map(it -> Boolean.parseBoolean(it.getConfig().getOrDefault(FORWARD_TO_LINKED_IDP, "false")))
+            .orElse(false);
+    }
+
+    boolean bypassLoginPage() {
+        return Optional.ofNullable(authenticatorConfigModel)
+            .map(it -> Boolean.parseBoolean(it.getConfig().getOrDefault(BYPASS_LOGIN_PAGE, "false")))
             .orElse(false);
     }
 

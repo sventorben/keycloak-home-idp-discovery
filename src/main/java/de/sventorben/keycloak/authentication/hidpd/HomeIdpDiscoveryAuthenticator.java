@@ -13,13 +13,13 @@ import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
-import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.services.managers.AuthenticationManager;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.Optional;
 
+import static org.keycloak.protocol.oidc.OIDCLoginProtocol.*;
 import static org.keycloak.services.validation.Validation.FIELD_USERNAME;
 
 final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthenticator {
@@ -31,6 +31,17 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+        HomeIdpDiscoveryConfig config = new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig());
+
+        if (new LoginPage(context, config).shouldByPass()) {
+            String loginHint = context.getAuthenticationSession().getClientNote(LOGIN_HINT_PARAM);
+            String username = setUserInContext(context, loginHint);
+            final Optional<IdentityProviderModel> homeIdp = new HomeIdpDiscoverer(context).discoverForUser(username);
+            if (homeIdp.isPresent()) {
+                new Redirector(context).redirectTo(homeIdp.get());
+                return;
+            }
+        }
         new AuthenticationChallenge(context).challenge();
     }
 
@@ -43,7 +54,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             return;
         }
 
-        String username = setUserInContext(context, formData);
+        String username = setUserInContext(context, formData.getFirst(AuthenticationManager.FORM_USERNAME));
         if (username == null) {
             LOG.debugf("No username in request");
             return;
@@ -58,16 +69,10 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         }
     }
 
-    private String setUserInContext(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
+    private String setUserInContext(AuthenticationFlowContext context, String username) {
         context.clearUser();
 
-        String username = inputData.getFirst(AuthenticationManager.FORM_USERNAME);
-
-        if (username != null) {
-            username = username.trim();
-            if ("".equalsIgnoreCase(username))
-                username = null;
-        }
+        username = trimToNull(username);
 
         if (username == null) {
             LOG.warn("No or empty username found in request");
@@ -80,7 +85,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         LOG.debugf("Found username '%s' in request", username);
         context.getEvent().detail(Details.USERNAME, username);
         context.getAuthenticationSession().setAuthNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME, username);
-        context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, username);
+        context.getAuthenticationSession().setClientNote(LOGIN_HINT_PARAM, username);
 
         try {
             UserModel user = KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(),
@@ -93,6 +98,15 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             LOG.warnf(ex, "Could not uniquely identify the user. Multiple users with name or email '%s' found.", username);
         }
 
+        return username;
+    }
+
+    private String trimToNull(String username) {
+        if (username != null) {
+            username = username.trim();
+            if ("".equalsIgnoreCase(username))
+                username = null;
+        }
         return username;
     }
 
