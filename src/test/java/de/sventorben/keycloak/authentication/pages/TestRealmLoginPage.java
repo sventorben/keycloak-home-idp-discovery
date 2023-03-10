@@ -13,6 +13,8 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class TestRealmLoginPage {
 
+    private static final String OIDC_AUTH_PATH = "/realms/test-realm/protocol/openid-connect/auth";
+
     private final WebDriver webDriver;
     private final String keycloakBaseUrl;
 
@@ -29,7 +31,7 @@ public class TestRealmLoginPage {
         this.webDriver = webDriver;
         this.keycloakBaseUrl = keycloakBaseUrl;
         PageFactory.initElements(webDriver, this);
-        assertThat(webDriver.getCurrentUrl()).startsWith(keycloakBaseUrl + "/realms/test-realm/protocol/openid-connect/auth");
+        assertThat(webDriver.getCurrentUrl()).startsWith(keycloakBaseUrl + OIDC_AUTH_PATH);
     }
 
     public void signIn(String username) {
@@ -41,6 +43,10 @@ public class TestRealmLoginPage {
     public void tryAnotherWay() {
         new WebDriverWait(webDriver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOf(tryAnotherWayLink));
         tryAnotherWayLink.click();
+    }
+
+    public void assertLoginForClient(String clientId) {
+        assertThat(webDriver.getCurrentUrl()).contains("client_id=" + clientId);
     }
 
 }

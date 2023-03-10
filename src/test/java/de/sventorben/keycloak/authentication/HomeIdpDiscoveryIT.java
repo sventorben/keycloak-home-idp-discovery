@@ -3,8 +3,10 @@ package de.sventorben.keycloak.authentication;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import de.sventorben.keycloak.authentication.pages.AccountConsolePage;
 import de.sventorben.keycloak.authentication.pages.TestRealmLoginPage;
+import de.sventorben.keycloak.authentication.pages.UpstreamIdpMock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.Keycloak;
@@ -51,7 +53,7 @@ class HomeIdpDiscoveryIT {
         .withProviderClassesFrom("target/classes")
         .withExposedPorts(KEYCLOAK_HTTP_PORT)
         .withLogConsumer(new Slf4jLogConsumer(LOGGER).withSeparateOutputStreams())
-        .withStartupTimeout(Duration.ofSeconds(60))
+        .withStartupTimeout(Duration.ofSeconds(90))
         .withNetwork(NETWORK)
         .withNetworkAliases("keycloak")
         .withAdminUsername(KEYCLOAK_ADMIN_USER)
@@ -84,57 +86,117 @@ class HomeIdpDiscoveryIT {
     private RemoteWebDriver webDriver;
 
     @BeforeEach
-    public void gotoLoginPage() {
+    public void setUp() {
         webDriver = setupDriver();
         resetAuthenticatorConfig();
-        accountConsolePage().signIn();
     }
 
     @Test
+    @DisplayName("Given user's email is has a primary managed domain, redirect")
     public void redirectIfUserHasDomain() {
+        accountConsolePage().signIn();
         testRealmLoginPage().signIn("test@example.com");
         assertRedirectedToIdp();
     }
 
     @Test
+    @DisplayName("Given user's email is has an alternate managed domain, redirect")
     public void redirectIfUserHasAlternateDomain() {
+        accountConsolePage().signIn();
         testRealmLoginPage().signIn("test2@example.net");
         assertRedirectedToIdp();
     }
 
     @Test
-    public void doNotRedirectIfUserHasNonConfiguredDomain() {
+    @DisplayName("Given user's email has non managed domain, do not redirect")
+    public void doNotRedirectIfUserHasNonManagedDomain() {
+        accountConsolePage().signIn();
         testRealmLoginPage().signIn("test3@example.org");
         assertNotRedirected();
     }
 
     @Test
+    @DisplayName("Given user's email is not verified, do not redirect")
     public void doNotRedirectIfUserEmailIsNotVerified() {
+        accountConsolePage().signIn();
         testRealmLoginPage().signIn("test4@example.com");
         assertNotRedirected();
     }
 
     @Test
+    @DisplayName("Given the user has a matching domain in custom user attribute, redirect")
     public void redirectIfUserHasDomainAsPartOfCustomUserAttribute() {
         setUserAttribute("UPN");
+        accountConsolePage().signIn();
         testRealmLoginPage().signIn("test4@example.com");
         assertRedirectedToIdp();
     }
 
     @Nested
+    @DisplayName("Given login page should be bypassed")
+    class GivenLoginPageShouldBeBypassed {
+
+        @BeforeEach
+        public void setUp() {
+            enableBypassLoginPage();
+        }
+
+        @Test
+        @DisplayName("Given user's email is has a primary managed domain, redirect")
+        public void redirectIfUserHasDomain() {
+            upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test@example.com");
+            assertRedirectedToIdp();
+        }
+
+        @Test
+        @DisplayName("Given user's email is has an alternate managed domain, redirect")
+        public void redirectIfUserHasAlternateDomain() {
+            upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test2@example.net");
+            assertRedirectedToIdp();
+        }
+
+        @Test
+        @DisplayName("Given user's email has non managed domain, do not redirect")
+        public void doNotRedirectIfUserHasNonManagedDomain() {
+            upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test3@example.org");
+            testRealmLoginPage().assertLoginForClient("test");
+        }
+
+        @Test
+        @DisplayName("Given user's email is not verified, do not redirect")
+        public void doNotRedirectIfUserEmailIsNotVerified() {
+            upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test4@example.com");
+            testRealmLoginPage().assertLoginForClient("test");
+        }
+
+        @Test
+        @DisplayName("Given the user has a matching domain in custom user attribute, redirect")
+        public void redirectIfUserHasDomainAsPartOfCustomUserAttribute() {
+            setUserAttribute("UPN");
+            upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test4@example.com");
+            assertRedirectedToIdp();
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Given user is linked to an IdP already")
     class GivenUserHasIdpLinkConfigured {
 
         private String username = "test5";
 
         @Nested
+        @DisplayName("and given forwarding to linked IdPs is disabled")
         class ButForwardingNotEnabled {
 
             @BeforeEach
             public void setUp() {
                 disableForwarding();
+                accountConsolePage().signIn();
             }
 
             @Test
+            @DisplayName("then do not redirect")
             public void willNotRedirectToIdp() {
                 testRealmLoginPage().signIn(username);
                 assertNotRedirected();
@@ -142,20 +204,24 @@ class HomeIdpDiscoveryIT {
         }
 
         @Nested
+        @DisplayName("and given forwarding to linked IdPs is enabled")
         class AndForwardingEnabled {
 
             @BeforeEach
             public void setUp() {
                 enableForwarding();
+                accountConsolePage().signIn();
             }
 
             @Test
+            @DisplayName("then redirect")
             public void willRedirectToIdp() {
                 testRealmLoginPage().signIn(username);
                 assertRedirectedToIdp();
             }
 
             @Test
+            @DisplayName("then pass login_hint parameter to downstream IdP")
             public void willForwardLoginHint() {
                 testRealmLoginPage().signIn(username);
                 assertThat(webDriver.getCurrentUrl()).contains("&login_hint=idp-test5-username&");
@@ -171,12 +237,8 @@ class HomeIdpDiscoveryIT {
         return new TestRealmLoginPage(webDriver, KEYCLOAK_BASE_URL);
     }
 
-    private void enableForwarding() {
-        setForwarding(true);
-    }
-
-    private void disableForwarding() {
-        setForwarding(false);
+    private UpstreamIdpMock upstreamIdpMock() {
+        return new UpstreamIdpMock(webDriver, KEYCLOAK_BASE_URL);
     }
 
     private void setUserAttribute(String userAttribute) {
@@ -187,6 +249,14 @@ class HomeIdpDiscoveryIT {
         });
     }
 
+    private void enableForwarding() {
+        setForwarding(true);
+    }
+
+    private void disableForwarding() {
+        setForwarding(false);
+    }
+
     private void setForwarding(Boolean enabled) {
         updateAuthenticatorConfig(authenticatorConfig -> {
             Map<String, String> config = authenticatorConfig.getConfig();
@@ -195,13 +265,30 @@ class HomeIdpDiscoveryIT {
         });
     }
 
+    private void enableBypassLoginPage() {
+        setBypassLoginPage(true);
+    }
+
+    private void disableBypassLoginPage() {
+        setBypassLoginPage(false);
+    }
+
+    private void setBypassLoginPage(Boolean enabled) {
+        updateAuthenticatorConfig(authenticatorConfig -> {
+            Map<String, String> config = authenticatorConfig.getConfig();
+            config.put("bypassLoginPage", enabled.toString());
+            authenticatorConfig.setConfig(config);
+        });
+    }
+
     private void resetAuthenticatorConfig() {
         disableForwarding();
+        disableBypassLoginPage();
         setUserAttribute("email");
     }
 
     private void updateAuthenticatorConfig(Consumer<AuthenticatorConfigRepresentation> configurer) {
-        try(Keycloak admin = getKeycloakAdminClient()) {
+        try (Keycloak admin = getKeycloakAdminClient()) {
             AuthenticationManagementResource flows = admin.realm(REALM_TEST).flows();
             AuthenticationExecutionInfoRepresentation execution = flows
                 .getExecutions("discover home idp").stream()
@@ -235,7 +322,8 @@ class HomeIdpDiscoveryIT {
     }
 
     private void assertNotRedirected() {
-        assertRedirectedTo(KEYCLOAK_BASE_URL + "/realms/test-realm/login-actions/authenticate?client_id=account-console");
+        assertRedirectedTo(
+            KEYCLOAK_BASE_URL + "/realms/test-realm/login-actions/authenticate?client_id=account-console");
     }
 
     private void assertRedirectedTo(String url) {
