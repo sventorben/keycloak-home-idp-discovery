@@ -6,6 +6,7 @@ changelog:
             - dependabot
             - dependabot[bot]
             - actions-user
+            - github-actions
     categories:
         - title: ":boom: Breaking Changes"
           labels:
