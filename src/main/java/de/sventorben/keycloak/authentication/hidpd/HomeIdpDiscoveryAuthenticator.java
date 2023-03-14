@@ -38,6 +38,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             String username = setUserInContext(context, loginHint);
             final Optional<IdentityProviderModel> homeIdp = new HomeIdpDiscoverer(context).discoverForUser(username);
             if (homeIdp.isPresent()) {
+                new RememberMe(context).remember(username);
                 new Redirector(context).redirectTo(homeIdp.get());
                 return;
             }
@@ -65,6 +66,9 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         if (homeIdp.isEmpty()) {
             context.attempted();
         } else {
+            RememberMe rememberMe = new RememberMe(context);
+            rememberMe.handleAction(formData);
+            rememberMe.remember(username);
             new Redirector(context).redirectTo(homeIdp.get());
         }
     }

@@ -27,6 +27,9 @@ public class TestRealmLoginPage {
     @FindBy(css = "a[id='try-another-way']")
     private WebElement tryAnotherWayLink;
 
+    @FindBy(css = "input[id='rememberMe']")
+    private WebElement rememberMe;
+
     public TestRealmLoginPage(WebDriver webDriver, String keycloakBaseUrl) {
         this.webDriver = webDriver;
         this.keycloakBaseUrl = keycloakBaseUrl;
@@ -43,6 +46,20 @@ public class TestRealmLoginPage {
     public void tryAnotherWay() {
         new WebDriverWait(webDriver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOf(tryAnotherWayLink));
         tryAnotherWayLink.click();
+    }
+
+    public void enableRememberMe() {
+        if (!rememberMe.isSelected()) {
+            rememberMe.click();
+        }
+        assertThat(rememberMe.isSelected()).isTrue();
+    }
+
+    public void disableRememberMe() {
+        if (rememberMe.isSelected()) {
+            rememberMe.click();
+        }
+        assertThat(rememberMe.isSelected()).isFalse();
     }
 
     public void assertLoginForClient(String clientId) {
