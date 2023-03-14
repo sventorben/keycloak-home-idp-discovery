@@ -13,6 +13,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -29,7 +30,9 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -130,6 +133,56 @@ class HomeIdpDiscoveryIT {
         accountConsolePage().signIn();
         testRealmLoginPage().signIn("test4@example.com");
         assertRedirectedToIdp();
+    }
+
+    @Nested
+    @DisplayName("Remember Me")
+    class RememberMe {
+
+        private static final String COOKIE_NAME_REMEMBER_ME = "KEYCLOAK_REMEMBER_ME";
+
+        @Test
+        @DisplayName("Given the user has checked 'remember me' feature, remember user in cookie")
+        public void testUserGetsRemembered() {
+            accountConsolePage().signIn();
+
+            TestRealmLoginPage testRealmLoginPage = testRealmLoginPage();
+            testRealmLoginPage.enableRememberMe();
+            testRealmLoginPage.signIn("test@example.com");
+            assertRedirectedToIdp();
+
+            getKeycloakAdminClient().realm("test-realm")
+                .users()
+                .get("139020a3-4459-43b1-a92f-d90e5cf093a1")
+                .logout();
+
+            accountConsolePage().signIn();
+
+            Set<Cookie> cookies = webDriver.manage().getCookies();
+            assertThat(cookies).contains(new Cookie(COOKIE_NAME_REMEMBER_ME, "username:test%40example.com"));
+        }
+
+        @Test
+        @DisplayName("Given the user has unchecked 'remember me' feature, cookie will be removed")
+        public void testUserWillBeForgotten() {
+            testUserGetsRemembered();
+
+            TestRealmLoginPage testRealmLoginPage = testRealmLoginPage();
+            testRealmLoginPage.disableRememberMe();
+            testRealmLoginPage.signIn("test@example.com");
+            assertRedirectedToIdp();
+
+            getKeycloakAdminClient().realm("test-realm")
+                .users()
+                .get("139020a3-4459-43b1-a92f-d90e5cf093a1")
+                .logout();
+
+            accountConsolePage().signIn();
+
+            Set<Cookie> cookies = webDriver.manage().getCookies();
+            assertThat(cookies.stream().map(Cookie::getName).collect(Collectors.toList()))
+                .doesNotContain(COOKIE_NAME_REMEMBER_ME);
+        }
     }
 
     @Nested
