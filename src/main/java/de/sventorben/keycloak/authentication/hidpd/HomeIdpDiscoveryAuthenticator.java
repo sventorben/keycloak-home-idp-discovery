@@ -7,19 +7,23 @@ import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAu
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.models.FederatedIdentityModel;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
+import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.services.managers.AuthenticationManager;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.*;
+import static org.keycloak.protocol.oidc.OIDCLoginProtocol.LOGIN_HINT_PARAM;
 import static org.keycloak.services.validation.Validation.FIELD_USERNAME;
 
 final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthenticator {
@@ -36,14 +40,30 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         if (new LoginPage(context, config).shouldByPass()) {
             String loginHint = context.getAuthenticationSession().getClientNote(LOGIN_HINT_PARAM);
             String username = setUserInContext(context, loginHint);
-            final Optional<IdentityProviderModel> homeIdp = new HomeIdpDiscoverer(context).discoverForUser(username);
+            final Optional<IdentityProviderModel> homeIdp = new HomeIdpDiscoverer(context).discoverForUser(username)
+                .stream().findFirst();
             if (homeIdp.isPresent()) {
                 new RememberMe(context).remember(username);
+                setLoginHint(context, homeIdp.get(), username);
                 new Redirector(context).redirectTo(homeIdp.get());
                 return;
             }
         }
         new AuthenticationChallenge(context).challenge();
+    }
+
+    private void setLoginHint(AuthenticationFlowContext context, IdentityProviderModel homeIdp, String defaultUsername) {
+        String loginHint;
+        UserModel user = context.getUser();
+        if (user != null) {
+            Map<String, String> idpToUsername = context.getSession().users()
+                .getFederatedIdentitiesStream(context.getRealm(), user)
+                .collect(
+                    Collectors.toMap(FederatedIdentityModel::getIdentityProvider,
+                        FederatedIdentityModel::getUserName));
+            loginHint = idpToUsername.getOrDefault(homeIdp.getAlias(), defaultUsername);
+            context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, loginHint);
+        }
     }
 
     @Override
@@ -61,7 +81,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             return;
         }
 
-        final Optional<IdentityProviderModel> homeIdp = new HomeIdpDiscoverer(context).discoverForUser(username);
+        final Optional<IdentityProviderModel> homeIdp = new HomeIdpDiscoverer(context).discoverForUser(username).stream().findFirst();
 
         if (homeIdp.isEmpty()) {
             context.attempted();
@@ -69,6 +89,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             RememberMe rememberMe = new RememberMe(context);
             rememberMe.handleAction(formData);
             rememberMe.remember(username);
+            setLoginHint(context, homeIdp.get(), username);
             new Redirector(context).redirectTo(homeIdp.get());
         }
     }
@@ -99,7 +120,8 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
                 context.setUser(user);
             }
         } catch (ModelDuplicateException ex) {
-            LOG.warnf(ex, "Could not uniquely identify the user. Multiple users with name or email '%s' found.", username);
+            LOG.warnf(ex, "Could not uniquely identify the user. Multiple users with name or email '%s' found.",
+                username);
         }
 
         return username;

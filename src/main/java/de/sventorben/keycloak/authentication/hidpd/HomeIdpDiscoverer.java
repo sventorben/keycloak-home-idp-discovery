@@ -7,8 +7,8 @@ import org.keycloak.models.FederatedIdentityModel;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,15 +31,14 @@ final class HomeIdpDiscoverer {
         this.context = context;
     }
 
-    public Optional<IdentityProviderModel> discoverForUser(String username) {
+    public List<IdentityProviderModel> discoverForUser(String username) {
 
         String realmName = context.getRealm().getName();
         AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
-        LOG.tracef(
-            "Trying to discover home IdP for username '%s' in realm '%s' with authenticator config '%s'",
+        LOG.tracef("Trying to discover home IdP for username '%s' in realm '%s' with authenticator config '%s'",
             username, realmName, authenticatorConfig == null ? "<unconfigured>" : authenticatorConfig.getAlias());
 
-        Optional<IdentityProviderModel> homeIdp = Optional.empty();
+        List<IdentityProviderModel> homeIdps = new ArrayList<>();
 
         final Optional<String> emailDomain;
         UserModel user = context.getUser();
@@ -55,18 +54,19 @@ final class HomeIdpDiscoverer {
 
         if (emailDomain.isPresent()) {
             String domain = emailDomain.get();
-            homeIdp = discoverHomeIdp(domain, user, username);
-            if (homeIdp.isEmpty()) {
-                LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'", domain, username, realmName);
+            homeIdps = discoverHomeIdps(domain, user, username);
+            if (homeIdps.isEmpty()) {
+                LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'", domain, username,
+                    realmName);
             }
         } else {
             LOG.warnf("Could not extract domain from email address '%s'", username);
         }
 
-        return homeIdp;
+        return homeIdps;
     }
 
-    private Optional<IdentityProviderModel> discoverHomeIdp(String domain, UserModel user, String username) {
+    private List<IdentityProviderModel> discoverHomeIdps(String domain, UserModel user, String username) {
         final Map<String, String> linkedIdps;
 
         HomeIdpDiscoveryConfig config = new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig());
@@ -91,40 +91,39 @@ final class HomeIdpDiscoverer {
             config);
 
         // Prefer linked IdP with matching domain first
-        Optional<IdentityProviderModel> homeIdp = getLinkedIdpFrom(enabledIdpsWithMatchingDomain, linkedIdps);
+        List<IdentityProviderModel> homeIdps = getLinkedIdpsFrom(enabledIdpsWithMatchingDomain, linkedIdps);
 
-        if (homeIdp.isEmpty()) {
+        if (homeIdps.isEmpty()) {
             if (!linkedIdps.isEmpty()) {
                 // Prefer linked and enabled IdPs without matching domain in favor of not linked IdPs with matching domain
-                homeIdp = getLinkedIdpFrom(enabledIdps, linkedIdps);
+                homeIdps = getLinkedIdpsFrom(enabledIdps, linkedIdps);
             }
-            if (homeIdp.isEmpty()) {
-                // Fallback to not linked IdP with matching domain (general case if user logs in for the first time)
-                homeIdp = enabledIdpsWithMatchingDomain.stream().findFirst();
-                homeIdp.ifPresent(idp -> LOG.tracef(
-                    "Found non-linked IdP '%s' with matching domain '%s' for user '%s'",
-                    idp.getAlias(), domain, username));
+            if (homeIdps.isEmpty()) {
+                // Fallback to not linked IdPs with matching domain (general case if user logs in for the first time)
+                homeIdps = enabledIdpsWithMatchingDomain;
+                logFoundIdps("non-linked", "matching", homeIdps, domain, username);
             } else {
-                LOG.tracef("Found linked IdP '%s' without matching domain '%s' for user '%s'", homeIdp.get().getAlias(),
-                    domain, username);
+                logFoundIdps("non-linked", "non-matching", homeIdps, domain, username);
             }
         } else {
-            LOG.tracef("Found linked IdP '%s' with matching domain '%s' for user '%s'", homeIdp.get().getAlias(),
-                domain, username);
+            logFoundIdps("linked", "matching", homeIdps, domain, username);
         }
 
-        homeIdp.ifPresent(idp -> {
-            String loginHint = linkedIdps.getOrDefault(idp.getAlias(), username);
-            context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, loginHint);
-        });
-
-        return homeIdp;
+        return homeIdps;
     }
 
-    private Optional<IdentityProviderModel> getLinkedIdpFrom(List<IdentityProviderModel> enabledIdpsWithMatchingDomain, Map<String, String> linkedIdps) {
+    private void logFoundIdps(String idpQualifier, String domainQualifier, List<IdentityProviderModel> homeIdps, String domain, String username) {
+        String homeIdpsString = homeIdps.stream()
+            .map(IdentityProviderModel::getAlias)
+            .collect(Collectors.joining(","));
+        LOG.tracef("Found %s IdPs [%s] with %s domain '%s' for user '%s'",
+            idpQualifier, homeIdpsString, domainQualifier, domain, username);
+    }
+
+    private List<IdentityProviderModel> getLinkedIdpsFrom(List<IdentityProviderModel> enabledIdpsWithMatchingDomain, Map<String, String> linkedIdps) {
         return enabledIdpsWithMatchingDomain.stream()
             .filter(it -> linkedIdps.containsKey(it.getAlias()))
-            .findFirst();
+            .collect(Collectors.toList());
     }
 
     private List<IdentityProviderModel> filterIdpsWithMatchingDomainFrom(List<IdentityProviderModel> enabledIdps, String domain, HomeIdpDiscoveryConfig config) {
