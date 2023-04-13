@@ -7,6 +7,7 @@ import java.util.List;
 
 import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.BYPASS_LOGIN_PAGE;
 import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.FORWARD_TO_LINKED_IDP;
+import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.FORWARD_TO_FIRST_MATCH;
 import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.USER_ATTRIBUTE;
 import static org.keycloak.provider.ProviderConfigProperty.BOOLEAN_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
@@ -29,6 +30,14 @@ final class HomeIdpDiscoveryConfigProperties {
         false,
         false);
 
+    private static final ProviderConfigProperty FORWARD_TO_FIRST_MATCH_PROPERTY = new ProviderConfigProperty(
+        FORWARD_TO_FIRST_MATCH,
+        "Forward to first matched IdP",
+        "When multiple IdPs match the domain, whether to forward to the first IdP found or let the user choose.",
+        BOOLEAN_TYPE,
+        true,
+        false);
+
     private static final ProviderConfigProperty USER_ATTRIBUTE_PROPERTY = new ProviderConfigProperty(
         USER_ATTRIBUTE,
         "User attribute",
@@ -41,6 +50,7 @@ final class HomeIdpDiscoveryConfigProperties {
         .property(USER_ATTRIBUTE_PROPERTY)
         .property(BYPASS_LOGIN_PAGE_PROPERTY)
         .property(FORWARD_TO_LINKED_IDP_PROPERTY)
+        .property(FORWARD_TO_FIRST_MATCH_PROPERTY)
         .build();
 
 }

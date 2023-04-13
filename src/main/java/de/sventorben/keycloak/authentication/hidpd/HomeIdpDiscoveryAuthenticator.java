@@ -7,21 +7,17 @@ import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAu
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
-import org.keycloak.models.FederatedIdentityModel;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
-import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.services.managers.AuthenticationManager;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static org.keycloak.protocol.oidc.OIDCLoginProtocol.LOGIN_HINT_PARAM;
 import static org.keycloak.services.validation.Validation.FIELD_USERNAME;
@@ -34,63 +30,57 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
     }
 
     @Override
-    public void authenticate(AuthenticationFlowContext context) {
-        HomeIdpDiscoveryConfig config = new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig());
+    public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
+        HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
 
-        if (new LoginPage(context, config).shouldByPass()) {
-            String loginHint = context.getAuthenticationSession().getClientNote(LOGIN_HINT_PARAM);
-            String username = setUserInContext(context, loginHint);
-            final Optional<IdentityProviderModel> homeIdp = new HomeIdpDiscoverer(context).discoverForUser(username)
-                .stream().findFirst();
-            if (homeIdp.isPresent()) {
-                new RememberMe(context).remember(username);
-                setLoginHint(context, homeIdp.get(), username);
-                new Redirector(context).redirectTo(homeIdp.get());
+        if (context.loginPage().shouldByPass()) {
+            String loginHint = context.loginHint().getFromSession();
+            String username = setUserInContext(authenticationFlowContext, loginHint);
+            final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(username);
+            if (!homeIdps.isEmpty()) {
+                context.rememberMe().remember(username);
+                redirectOrChallenge(context, username, homeIdps);
                 return;
             }
         }
-        new AuthenticationChallenge(context).challenge();
+        context.authenticationChallenge().forceChallenge();
     }
 
-    private void setLoginHint(AuthenticationFlowContext context, IdentityProviderModel homeIdp, String defaultUsername) {
-        String loginHint;
-        UserModel user = context.getUser();
-        if (user != null) {
-            Map<String, String> idpToUsername = context.getSession().users()
-                .getFederatedIdentitiesStream(context.getRealm(), user)
-                .collect(
-                    Collectors.toMap(FederatedIdentityModel::getIdentityProvider,
-                        FederatedIdentityModel::getUserName));
-            loginHint = idpToUsername.getOrDefault(homeIdp.getAlias(), defaultUsername);
-            context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, loginHint);
+    private void redirectOrChallenge(HomeIdpAuthenticationFlowContext context, String username, List<IdentityProviderModel> homeIdps) {
+        if (homeIdps.size() == 1 || context.config().forwardToFirstMatch()) {
+            IdentityProviderModel homeIdp = homeIdps.get(0);
+            context.loginHint().setInAuthSession(homeIdp, username);
+            context.redirector().redirectTo(homeIdp);
+        } else {
+            context.authenticationChallenge().forceChallenge(homeIdps);
         }
     }
 
     @Override
-    public void action(AuthenticationFlowContext context) {
-        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+    public void action(AuthenticationFlowContext authenticationFlowContext) {
+        MultivaluedMap<String, String> formData = authenticationFlowContext.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
             LOG.debugf("Login canceled");
-            context.cancelLogin();
+            authenticationFlowContext.cancelLogin();
             return;
         }
 
-        String username = setUserInContext(context, formData.getFirst(AuthenticationManager.FORM_USERNAME));
+        String username = setUserInContext(authenticationFlowContext, formData.getFirst(AuthenticationManager.FORM_USERNAME));
         if (username == null) {
             LOG.debugf("No username in request");
             return;
         }
 
-        final Optional<IdentityProviderModel> homeIdp = new HomeIdpDiscoverer(context).discoverForUser(username).stream().findFirst();
+        HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
 
-        if (homeIdp.isEmpty()) {
-            context.attempted();
+        final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(username);
+        if (homeIdps.isEmpty()) {
+            authenticationFlowContext.attempted();
         } else {
-            RememberMe rememberMe = new RememberMe(context);
+            RememberMe rememberMe = context.rememberMe();
             rememberMe.handleAction(formData);
             rememberMe.remember(username);
-            setLoginHint(context, homeIdp.get(), username);
-            new Redirector(context).redirectTo(homeIdp.get());
+            redirectOrChallenge(context, username, homeIdps);
         }
     }
 
@@ -109,7 +99,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
 
         LOG.debugf("Found username '%s' in request", username);
         context.getEvent().detail(Details.USERNAME, username);
-        context.getAuthenticationSession().setAuthNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME, username);
+        context.getAuthenticationSession().setAuthNote(ATTEMPTED_USERNAME, username);
         context.getAuthenticationSession().setClientNote(LOGIN_HINT_PARAM, username);
 
         try {

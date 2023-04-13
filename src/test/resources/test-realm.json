@@ -1141,7 +1141,37 @@
         "loginHint": "true",
         "home.idp.discovery.domains": "example.com##example.net"
       }
-    }
+    },
+      {
+          "alias": "keycloak-oidc2",
+          "internalId": "bd6b93b3-a5a9-47d0-8925-4737737e67f5",
+          "providerId": "keycloak-oidc",
+          "enabled": true,
+          "updateProfileFirstLoginMode": "on",
+          "trustEmail": false,
+          "storeToken": false,
+          "addReadTokenRoleOnCreate": false,
+          "authenticateByDefault": false,
+          "linkOnly": false,
+          "firstBrokerLoginFlowAlias": "first broker login",
+          "config": {
+              "userInfoUrl": "http://keycloak:8080/realms/idp/protocol/openid-connect/userinfo",
+              "validateSignature": "true",
+              "clientId": "test-realm",
+              "tokenUrl": "http://keycloak:8080/realms/idp/protocol/openid-connect/token",
+              "jwksUrl": "http://keycloak:8080/realms/idp/protocol/openid-connect/certs",
+              "issuer": "http://keycloak:8080/realms/idp",
+              "useJwksUrl": "true",
+              "authorizationUrl": "http://keycloak:8080/realms/idp/protocol/openid-connect/auth",
+              "clientAuthMethod": "client_secret_post",
+              "logoutUrl": "http://keycloak:8080/realms/idp/protocol/openid-connect/logout",
+              "syncMode": "IMPORT",
+              "clientSecret": "37774939-ea10-4625-9ef6-c56fec83e0d1",
+              "loginHint": "true",
+              "home.idp.discovery.domains": "example.com",
+              "hideOnLoginPage": "true"
+          }
+      }
   ],
   "identityProviderMappers": [],
   "components": {

@@ -39,4 +39,9 @@ final class RememberMe {
             context.getAuthenticationSession().removeAuthNote(Details.REMEMBER_ME);
         }
     }
+
+    String getUserName() {
+        return AuthenticationManager.getRememberMeUsername(context.getRealm(),
+            context.getHttpRequest().getHttpHeaders());
+    }
 }
