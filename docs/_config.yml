@@ -1,4 +1,4 @@
-remote_theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs
 
 title: 'Keycloak: Home IdP Discovery'
 description: Discover home identity provider or realm by email domain
