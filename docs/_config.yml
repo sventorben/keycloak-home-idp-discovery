@@ -1,0 +1,9 @@
+remote_theme: just-the-docs
+
+title: Keycloak: Home IdP Discovery
+description: Discover home identity provider or realm by email domain
+
+url: https://sventorben.github.io/keycloak-home-idp-discovery
+
+aux_links:
+          Github Repository: https://github.com/sventorben/keycloak-home-idp-discovery
