@@ -22,13 +22,13 @@ A user can then enter an email address. Keycloak will then choose an identity pr
 
 The identity provider will be chosen by the following preference:
 1. If the `forwardToLinkedIdp` config option is enabled
-   1. Use a first linked identity provider with matching domain
-   2. Use a first linked identity provider
+   1. Use the first linked identity provider with matching domain
+   2. Use the first linked identity provider
    3. Use non-linked identity provider with matching domain
 2. If the `forwadToLinkedIdp` config option is disabled
    1. Use the first identity provider with matching domain
 
-Only enabled identity providers will be considered.
+Only enabled and not link-only identity providers will be considered.
 
 ## How to install?
 

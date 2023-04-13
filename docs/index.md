@@ -1,3 +1,1 @@
 # Keycloak: Home IdP Discovery
-
-
