@@ -2,8 +2,16 @@ remote_theme: just-the-docs
 
 title: 'Keycloak: Home IdP Discovery'
 description: Discover home identity provider or realm by email domain
-
-url: 'https://sventorben.github.io/keycloak-home-idp-discovery'
-
+url: 'https://sventorben.github.io'
 aux_links:
-          Github Repository: 'https://github.com/sventorben/keycloak-home-idp-discovery'
+  Author: 'https://sventorben.de'
+  Github: 'https://github.com/sventorben/keycloak-home-idp-discovery'
+search_enabled: true
+color_scheme: dark
+callouts:
+  warning:
+    title: Warning
+    color: yellow
+  note:
+    title: Note
+    color: blue
