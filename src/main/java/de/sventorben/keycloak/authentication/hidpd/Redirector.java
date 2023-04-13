@@ -37,14 +37,15 @@ final class Redirector {
         ClientSessionCode<AuthenticationSessionModel> clientSessionCode =
             new ClientSessionCode<>(keycloakSession, realm, authenticationSession);
         clientSessionCode.setAction(AuthenticationSessionModel.Action.AUTHENTICATE.name());
+        if (!idp.isEnabled()) {
+            LOG.warnf("Identity Provider %s is disabled.", providerAlias);
+            return;
+        }
         if (idp.isLinkOnly()) {
             LOG.warnf("Identity Provider %s is not allowed to perform a login.", providerAlias);
             return;
         }
-        String loginHint = context.getAuthenticationSession().getClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM);
-        if (clientSessionCode.getClientSession() != null && loginHint != null) {
-            clientSessionCode.getClientSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, loginHint);
-        }
+        new HomeIdpAuthenticationFlowContext(context).loginHint().copyTo(clientSessionCode);
         IdentityProviderFactory providerFactory = getIdentityProviderFactory(keycloakSession, idp);
         IdentityProvider identityProvider = providerFactory.create(keycloakSession, idp);
 

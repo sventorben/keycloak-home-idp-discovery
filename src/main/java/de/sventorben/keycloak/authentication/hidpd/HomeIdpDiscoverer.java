@@ -56,8 +56,8 @@ final class HomeIdpDiscoverer {
             String domain = emailDomain.get();
             homeIdps = discoverHomeIdps(domain, user, username);
             if (homeIdps.isEmpty()) {
-                LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'", domain, username,
-                    realmName);
+                LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'",
+                    domain, username, realmName);
             }
         } else {
             LOG.warnf("Could not extract domain from email address '%s'", username);

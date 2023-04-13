@@ -2,6 +2,7 @@ package de.sventorben.keycloak.authentication;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import de.sventorben.keycloak.authentication.pages.AccountConsolePage;
+import de.sventorben.keycloak.authentication.pages.SelectIdpPage;
 import de.sventorben.keycloak.authentication.pages.TestRealmLoginPage;
 import de.sventorben.keycloak.authentication.pages.UpstreamIdpMock;
 import org.junit.jupiter.api.AfterAll;
@@ -10,9 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.AuthenticationManagementResource;
-import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
-import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -23,12 +21,9 @@ import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.time.Duration;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HomeIdpDiscoveryIT {
 
     private static final String KEYCLOAK_BASE_URL = "http://keycloak:8080";
-    private static final String REALM_TEST = "test-realm";
     private static final Network NETWORK = Network.newNetwork();
 
     @Container
@@ -59,11 +53,17 @@ class HomeIdpDiscoveryIT {
     }
 
     private RemoteWebDriver webDriver;
+    private AuthenticatorConfig authenticatorConfig;
 
     @BeforeEach
     public void setUp() {
         webDriver = setupDriver();
-        resetAuthenticatorConfig();
+        authenticatorConfig = new AuthenticatorConfig(
+            KEYCLOAK_CONTAINER.getAuthServerUrl(),
+            KEYCLOAK_CONTAINER.getAdminUsername(),
+            KEYCLOAK_CONTAINER.getAdminPassword()
+        );
+        authenticatorConfig.resetAuthenticatorConfig();
     }
 
     @Test
@@ -101,7 +101,7 @@ class HomeIdpDiscoveryIT {
     @Test
     @DisplayName("Given the user has a matching domain in custom user attribute, redirect")
     public void redirectIfUserHasDomainAsPartOfCustomUserAttribute() {
-        setUserAttribute("UPN");
+        authenticatorConfig.setUserAttribute("UPN");
         accountConsolePage().signIn();
         testRealmLoginPage().signIn("test4@example.com");
         assertRedirectedToIdp();
@@ -163,7 +163,7 @@ class HomeIdpDiscoveryIT {
 
         @BeforeEach
         public void setUp() {
-            enableBypassLoginPage();
+            authenticatorConfig.enableBypassLoginPage();
         }
 
         @Test
@@ -197,9 +197,70 @@ class HomeIdpDiscoveryIT {
         @Test
         @DisplayName("Given the user has a matching domain in custom user attribute, redirect")
         public void redirectIfUserHasDomainAsPartOfCustomUserAttribute() {
-            setUserAttribute("UPN");
+            authenticatorConfig.setUserAttribute("UPN");
             upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test4@example.com");
             assertRedirectedToIdp();
+        }
+
+        @Nested
+        @DisplayName("and given forwarding to first match is disabled")
+        class GivenForwardingToFirstMatchIsDisabled {
+
+            @BeforeEach
+            void setUp() {
+                authenticatorConfig.disableForwardToFirstMatch();
+            }
+
+            @Test
+            @DisplayName("Given only one matched IdP, redirect")
+            public void redirectIfOnlyOneIdPMatchesDomain() {
+                upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test2@example.net");
+                assertRedirectedToIdp();
+            }
+
+            @Test
+            @DisplayName("Given multiple IdPs match, show selection")
+            public void showSelectionIfMultipleIdpsMatch() {
+                upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test@example.com");
+                selectIdpPage().assertPageTitle();
+            }
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Given forwarding to first match is disabled")
+    class GivenForwardingToFirstMatchIsDisabled {
+
+        @BeforeEach
+        void setUp() {
+            authenticatorConfig.disableForwardToFirstMatch();
+        }
+
+        @Test
+        @DisplayName("Given only one matched IdP, redirect")
+        public void redirectIfOnlyOneIdPMatchesDomain() {
+            accountConsolePage().signIn();
+            testRealmLoginPage().signIn("test2@example.net");
+            assertRedirectedToIdp();
+        }
+
+        @Test
+        @DisplayName("Given multiple IdPs match, show selection")
+        public void showSelectionIfMultipleIdpsMatch() {
+            accountConsolePage().signIn();
+            testRealmLoginPage().signIn("test@example.com");
+            selectIdpPage().assertOnPage();
+        }
+
+        @Test
+        @DisplayName("Given multiple IdPs match, when selecting one, redirects")
+        public void redirectToIdpAfterSelection() {
+            String idpAlias = "keycloak-oidc2";
+            accountConsolePage().signIn();
+            testRealmLoginPage().signIn("test@example.com");
+            selectIdpPage().selectIdp(idpAlias);
+            assertRedirectedToIdp(idpAlias);
         }
 
     }
@@ -216,7 +277,7 @@ class HomeIdpDiscoveryIT {
 
             @BeforeEach
             public void setUp() {
-                disableForwarding();
+                authenticatorConfig.disableForwarding();
                 accountConsolePage().signIn();
             }
 
@@ -234,7 +295,7 @@ class HomeIdpDiscoveryIT {
 
             @BeforeEach
             public void setUp() {
-                enableForwarding();
+                authenticatorConfig.enableForwarding();
                 accountConsolePage().signIn();
             }
 
@@ -254,6 +315,10 @@ class HomeIdpDiscoveryIT {
         }
     }
 
+    private SelectIdpPage selectIdpPage() {
+        return new SelectIdpPage(webDriver, KEYCLOAK_BASE_URL);
+    }
+
     private AccountConsolePage accountConsolePage() {
         return new AccountConsolePage(webDriver, KEYCLOAK_BASE_URL);
     }
@@ -266,84 +331,18 @@ class HomeIdpDiscoveryIT {
         return new UpstreamIdpMock(webDriver, KEYCLOAK_BASE_URL);
     }
 
-    private void setUserAttribute(String userAttribute) {
-        updateAuthenticatorConfig(authenticatorConfig -> {
-            Map<String, String> config = authenticatorConfig.getConfig();
-            config.put("userAttribute", userAttribute);
-            authenticatorConfig.setConfig(config);
-        });
-    }
-
-    private void enableForwarding() {
-        setForwarding(true);
-    }
-
-    private void disableForwarding() {
-        setForwarding(false);
-    }
-
-    private void setForwarding(Boolean enabled) {
-        updateAuthenticatorConfig(authenticatorConfig -> {
-            Map<String, String> config = authenticatorConfig.getConfig();
-            config.put("forwardToLinkedIdp", enabled.toString());
-            authenticatorConfig.setConfig(config);
-        });
-    }
-
-    private void enableBypassLoginPage() {
-        setBypassLoginPage(true);
-    }
-
-    private void disableBypassLoginPage() {
-        setBypassLoginPage(false);
-    }
-
-    private void setBypassLoginPage(Boolean enabled) {
-        updateAuthenticatorConfig(authenticatorConfig -> {
-            Map<String, String> config = authenticatorConfig.getConfig();
-            config.put("bypassLoginPage", enabled.toString());
-            authenticatorConfig.setConfig(config);
-        });
-    }
-
-    private void resetAuthenticatorConfig() {
-        disableForwarding();
-        disableBypassLoginPage();
-        setUserAttribute("email");
-    }
-
-    private void updateAuthenticatorConfig(Consumer<AuthenticatorConfigRepresentation> configurer) {
-        try (Keycloak admin = getKeycloakAdminClient()) {
-            AuthenticationManagementResource flows = admin.realm(REALM_TEST).flows();
-            AuthenticationExecutionInfoRepresentation execution = flows
-                .getExecutions("discover home idp").stream()
-                .filter(it -> it.getProviderId().equalsIgnoreCase("home-idp-discovery"))
-                .findFirst()
-                .get();
-            String authenticationConfigId = execution.getAuthenticationConfig();
-            AuthenticatorConfigRepresentation authenticatorConfig;
-            String authenticatorConfigAlias = "home-idp-discovery-flow-config";
-            if (authenticationConfigId == null) {
-                authenticatorConfig = new AuthenticatorConfigRepresentation();
-                authenticatorConfig.setAlias(authenticatorConfigAlias);
-                Response response = flows.newExecutionConfig(execution.getId(), authenticatorConfig);
-                String location = response.getHeaderString("Location");
-                authenticationConfigId = location.substring(location.lastIndexOf("/") + 1);
-            } else {
-                authenticatorConfig = flows.getAuthenticatorConfig(authenticationConfigId);
-            }
-            configurer.accept(authenticatorConfig);
-            flows.updateAuthenticatorConfig(authenticationConfigId, authenticatorConfig);
-        }
-    }
-
     private static Keycloak getKeycloakAdminClient() {
         return Keycloak.getInstance(KEYCLOAK_CONTAINER.getAuthServerUrl(), "master",
             KEYCLOAK_CONTAINER.getAdminUsername(), KEYCLOAK_CONTAINER.getAdminPassword(), "admin-cli");
     }
 
     private void assertRedirectedToIdp() {
+        assertRedirectedToIdp("keycloak-oidc");
+    }
+
+    private void assertRedirectedToIdp(String idpAlias) {
         assertRedirectedTo(KEYCLOAK_BASE_URL + "/realms/idp/protocol/openid-connect/auth");
+        assertThat(webDriver.getCurrentUrl()).contains("broker%2F" + idpAlias + "%2F");
     }
 
     private void assertNotRedirected() {
