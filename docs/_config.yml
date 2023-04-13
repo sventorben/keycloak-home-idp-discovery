@@ -6,6 +6,17 @@ url: 'https://sventorben.github.io'
 aux_links:
   Author: 'https://sventorben.de'
   Github: 'https://github.com/sventorben/keycloak-home-idp-discovery'
+# External navigation links
+nav_external_links:
+  - title: Release notes
+    url: https://github.com/sventorben/keycloak-home-idp-discovery/releases
+    hide_icon: false
+  - title: Contributing
+    url: https://github.com/sventorben/keycloak-home-idp-discovery/blob/main/CONTRIBUTING.md
+    hide_icon: false
+  - title: Issue tracker
+    url: https://github.com/sventorben/keycloak-home-idp-discovery/issues
+    hide_icon: false
 search_enabled: true
 color_scheme: dark
 callouts:
