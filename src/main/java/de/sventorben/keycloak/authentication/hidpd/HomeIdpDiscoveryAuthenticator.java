@@ -34,16 +34,18 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
 
         if (context.loginPage().shouldByPass()) {
-            String loginHint = context.loginHint().getFromSession();
+            String loginHint = trimToNull(context.loginHint().getFromSession());
             if (loginHint == null) {
-                loginHint = authenticationFlowContext.getAuthenticationSession().getAuthNote(ATTEMPTED_USERNAME);
+                loginHint = trimToNull(authenticationFlowContext.getAuthenticationSession().getAuthNote(ATTEMPTED_USERNAME));
             }
-            String username = setUserInContext(authenticationFlowContext, loginHint);
-            final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(username);
-            if (!homeIdps.isEmpty()) {
-                context.rememberMe().remember(username);
-                redirectOrChallenge(context, username, homeIdps);
-                return;
+            if (loginHint != null) {
+                String username = setUserInContext(authenticationFlowContext, loginHint);
+                final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(username);
+                if (!homeIdps.isEmpty()) {
+                    context.rememberMe().remember(username);
+                    redirectOrChallenge(context, username, homeIdps);
+                    return;
+                }
             }
         }
         context.authenticationChallenge().forceChallenge();
