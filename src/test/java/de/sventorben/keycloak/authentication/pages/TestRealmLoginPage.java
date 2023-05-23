@@ -1,5 +1,6 @@
 package de.sventorben.keycloak.authentication.pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -66,4 +67,7 @@ public class TestRealmLoginPage {
         assertThat(webDriver.getCurrentUrl()).contains("client_id=" + clientId);
     }
 
+    public void assertNoInvalidUserMessage() {
+        assertThat(webDriver.findElements(By.id("input-error-username"))).isEmpty();
+    }
 }

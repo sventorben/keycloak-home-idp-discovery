@@ -167,6 +167,14 @@ class HomeIdpDiscoveryIT {
         }
 
         @Test
+        @DisplayName("GH-199 - Given no login hint, should not dispaly error message")
+        public void gh199NoErrorMessage() {
+            upstreamIdpMock().redirectToDownstreamWithLoginHint("test", null);
+            testRealmLoginPage().assertLoginForClient("test");
+            testRealmLoginPage().assertNoInvalidUserMessage();
+        }
+
+        @Test
         @DisplayName("Given user's email is has a primary managed domain, redirect")
         public void redirectIfUserHasDomain() {
             upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test@example.com");
