@@ -51,11 +51,13 @@
         <maven.compiler.release>11</maven.compiler.release>
 
         <!-- For compilation -->
-        <version.keycloak>21.1.1</version.keycloak>
+        <!-- Keycloak 22 is not released officially. You will have build the Keycloak locally and install it in local maven repository -->
+        <version.keycloak>999.0.0-SNAPSHOT</version.keycloak>
 
         <!-- For compatibility tests -->
         <keycloak.version>${version.keycloak}</keycloak.version>
-
+        <jakarta.ws.rs.version>3.1.0</jakarta.ws.rs.version>
+		<resteasy.version>6.2.4.Final</resteasy.version>
         <version.mockito>5.4.0</version.mockito>
         <version.testcontainers>1.18.3</version.testcontainers>
         <version.selenium>4.10.0</version.selenium>
@@ -155,6 +157,30 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>${jakarta.ws.rs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-core</artifactId>
+                <version>${resteasy.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-simple</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
@@ -215,6 +241,30 @@
             <version>${version.keycloak}</version>
             <scope>provided</scope>
         </dependency>
+         <dependency>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>${jakarta.ws.rs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-core</artifactId>
+                <version>${resteasy.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-simple</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
         <!-- Test -->
         <dependency>

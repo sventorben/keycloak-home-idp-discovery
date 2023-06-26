@@ -15,7 +15,7 @@ import org.keycloak.services.Urls;
 import org.keycloak.services.managers.ClientSessionCode;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import static org.keycloak.services.resources.IdentityBrokerService.getIdentityProviderFactory;
 

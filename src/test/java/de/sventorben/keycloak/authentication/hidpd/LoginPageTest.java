@@ -13,8 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_PARAM;

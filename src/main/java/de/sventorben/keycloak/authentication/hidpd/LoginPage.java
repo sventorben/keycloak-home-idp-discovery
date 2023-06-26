@@ -6,7 +6,7 @@ import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.util.TokenUtil;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import java.util.Set;
 

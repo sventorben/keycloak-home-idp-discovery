@@ -5,7 +5,7 @@ import org.keycloak.events.Details;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.managers.AuthenticationManager;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 final class RememberMe {
 
