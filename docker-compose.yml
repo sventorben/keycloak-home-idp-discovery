@@ -1,14 +1,34 @@
 version: '3'
 services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    volumes: 
+      - ./pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+
   keycloak:
     container_name: keycloak
-    image: quay.io/keycloak/keycloak:21.1.1
+    image: quay.io/ecosystem-appeng/keycloak-22:keycloak-22@sha256:2fb901f139d7d5b1c22cc50414156bfd5802596fc2f8f4a08991abeb5b8d3d03
+    depends_on:
+      - "postgres"
     environment:
       KEYCLOAK_ADMIN: admin
+      DB_VENDOR: postgres
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
       KEYCLOAK_ADMIN_PASSWORD: admin
       DEBUG_PORT: '*:8787'
       DEBUG: 'true'
-    command: ['start-dev', '--debug', '--import-realm']
+    command: ['start-dev', '--debug', '--import-realm', "--db","postgres",
+            "--db-url","jdbc:postgresql://postgres:5432/keycloak",
+            "--db-username","keycloak",
+            "--db-password","password",]
     ports:
       - 8080:8080
       - 8443:8443
@@ -16,3 +36,4 @@ services:
     volumes:
     - ./target/keycloak-home-idp-discovery.jar:/opt/keycloak/providers/keycloak-home-idp-discovery.jar
     - ./src/test/resources/:/opt/keycloak/data/import
+

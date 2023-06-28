@@ -105,3 +105,4 @@ src/test/e2e/cypress/screenshots
 .classpath
 .project
 *.jar
+pgdata

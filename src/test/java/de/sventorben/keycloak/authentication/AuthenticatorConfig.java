@@ -5,7 +5,7 @@ import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.function.Consumer;
 
