@@ -1,4 +1,10 @@
-# Keycloak: Home IdP Discovery
+---
+layout: default
+title: Introduction
+nav_order: 1
+---
+
+# Home IdP Discovery - Introduction
 
 This is a simple Keycloak authenticator to redirect users to their home identity provider during login.
 

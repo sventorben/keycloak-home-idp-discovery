@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Installation
-nav_order: 5
+nav_order: 1
 ---
 
 # Installation
