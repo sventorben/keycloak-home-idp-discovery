@@ -15,7 +15,9 @@ nav_order: 2
 
 ---
 
-## Add Authenticator Execution
+## Authenticator execution
+
+First, you have to add an authenticator execution to your login flow.
 
 * Navigate to `Authentication`
 * Create a custom `Basic` flow
@@ -28,7 +30,7 @@ See the image below for an example:
 
 ![Example flow](images/flow.JPG)
 
-## Configuration options
+## General configuration options
 
 To configure click settings/gear icon (&#9881;)
 
@@ -41,7 +43,7 @@ To configure click settings/gear icon (&#9881;)
 | Forward to linked IdP         | If switched on, federated users (with already linked IdPs) will be forwarded to a linked IdP even if no IdP has been configured for the user's email address. Federated users can also use their local username for login instead of their email address.<br><br> If switched off, users will only be forwarded to IdPs with matching email domains. (default)                                                                                                                                                                                                                                                                                                                                                                              |
 | Forward to first matched IdP  | If switched on, users will be forwarded to the first IdP that matches the email domain (default), even if multiply IdPs may match.<br><br>If switched off, user will be shown all IdPs that match the email domain to choose one, iff multiple match.<br>The user will only be able to choose from IdPs that match the email domain. Please note that also IdPs that have [`Hide on Login Page`](https://www.keycloak.org/docs/latest/server_admin/#_general-idp-config) switched on will be shown.<br>If only one IdP matches, behavior is the same as if switched on.                                                                                                                                                                     |
 
-## Configure email domains
+## Email domains
 
 Email domains can be configured per identity provider. Currently, this can only be achieved via [Identity Providers REST API](https://www.keycloak.org/docs-api/19.0/rest-api/index.html#_identity_providers_resource). Make sure to post the full body, as you may receive from a `GET` request to the same endpoint, plus the `home.idp.discovery.domains` configuration.
 
@@ -95,3 +97,37 @@ In the example above, the following domains will be effective when using the con
 
 Please note that the lookup is case-insensitive, so `email` will be the same as `Email` or `EMAIL`.
 
+### Subdomain matching
+
+If you need to match subdomains, simply add a config key `home.idp.discovery.matchSubdomains.<attribute_name>` where `<attribute_name>` is the
+name of the attribute you are using. Valid values are `true` and `false` (default).
+
+```
+PUT /{realm}/identity-provider/instances/{alias}
+{
+  ...
+  "config": {
+    "home.idp.discovery.domains": "example.com",
+    "home.idp.discovery.matchSubdomains": false,
+    "home.idp.discovery.domains.upn": "enterprise.local",
+    "home.idp.discovery.matchSubdomains.upn": true
+    ...
+  },
+  ...
+}
+```
+
+In the example above, the following domains will be effective when using the configured attribute name:
+
+| configured attribute name | domain                    | effective | justification                                                                                 |
+|---------------------------|---------------------------|-----------|-----------------------------------------------------------------------------------------------|
+| email                     | example.com               | yes       | domain not configured for attribute, but fully matches default domain                         |
+| email                     | sub.example.com           | no        | domain not configured for attribute and subdomain matching is disabled for default domains    |
+| email                     | enterprise.local          | no        | domain not configured as default domain or attribute                                          |
+| email                     | sub.enterprise.local      | no        | domain not configured as default domain or attribute                                          |
+| upn                       | example.com               | no        | domain not configured for attribute                                                           |
+| upn                       | sub.example.com           | no        | domain not coinfigured for attribute                                                          |
+| upn                       | enterprise.local          | yes       | domain configured for attribute and fully matches configured domain                           |
+| upn                       | sub.enterprise.local      | yes       | subdomain matching is enabled for attribute and and domain is subdomain of configured domains |
+| upn                       | deep.sub.enterprise.local | yes       | subdomain matching is enabled for attribute and and domain is subdomain of configured domains |
+| upn                       | someenterprise.local      | no        | domain not coinfigured for attribute (suffix is identical, but it is not a subdomain          |

@@ -2,17 +2,12 @@ package de.sventorben.keycloak.authentication.hidpd;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.forms.login.LoginFormsProvider;
-import org.keycloak.forms.login.freemarker.model.IdentityProviderBean;
 import org.keycloak.models.IdentityProviderModel;
-import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.services.managers.AuthenticationManager;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 final class AuthenticationChallenge {
 
