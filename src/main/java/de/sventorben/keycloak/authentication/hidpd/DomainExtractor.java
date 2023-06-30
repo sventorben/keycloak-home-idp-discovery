@@ -16,7 +16,7 @@ final class DomainExtractor {
         this.config = config;
     }
 
-    Optional<String> extractFrom(UserModel user) {
+    Optional<Domain> extractFrom(UserModel user) {
         if (!user.isEnabled()) {
             LOG.warnf("User '%s' not enabled", user.getId());
             return Optional.empty();
@@ -33,15 +33,14 @@ final class DomainExtractor {
         return extractFrom(userAttribute);
     }
 
-    Optional<String> extractFrom(String usernameOrEmail) {
-        String domain = null;
+    Optional<Domain> extractFrom(String usernameOrEmail) {
+        Domain domain = null;
         if (usernameOrEmail != null) {
             int atIndex = usernameOrEmail.trim().lastIndexOf("@");
             if (atIndex >= 0) {
-                String email = usernameOrEmail;
-                domain = email.substring(atIndex + 1).trim();
-                if (domain.length() == 0) {
-                    domain = null;
+                String strDomain = usernameOrEmail.trim().substring(atIndex + 1);
+                if (strDomain.length() > 0) {
+                    domain = new Domain(strDomain);
                 }
             }
         }

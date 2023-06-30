@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class IdentityProviderModelConfigTest {
 
     private static final String DOMAINS_ATTRIBUTE_KEY = "home.idp.discovery.domains";
+    private static final String SUBDOMAINS_ATTRIBUTE_KEY = "home.idp.discovery.matchSubdomains";
 
     @ParameterizedTest
     @CsvSource(value = {
@@ -32,7 +33,7 @@ class IdentityProviderModelConfigTest {
         "email, email, example.com##example.org, , true",
         "email, email, '', example.com##example.org, false",
     }, nullValues = { "null" })
-    void testHasDomain(String userAttributeName, String userAttributeNameQuery, String userAttributeDomains, String defaultDomains, boolean expected) {
+    void testSupportsDomain(String userAttributeName, String userAttributeNameQuery, String userAttributeDomains, String defaultDomains, boolean expected) {
         Map<String, String> config = new HashMap<>();
         IdentityProviderModel idp = new IdentityProviderModel();
         idp.setConfig(config);
@@ -44,7 +45,33 @@ class IdentityProviderModelConfigTest {
             config.put(DOMAINS_ATTRIBUTE_KEY, defaultDomains);
         }
 
-        boolean result = cut.hasDomain(userAttributeNameQuery, "example.com");
+        boolean result = cut.supportsDomain(userAttributeNameQuery, new Domain("example.com"));
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "example.com,null,true",
+        "example.com,email,true",
+        "example.com,upn,true",
+        "sub.example.com,null,false",
+        "sub.example.com,email,true",
+        "sub.example.com,upn,false",
+    }, nullValues = { "null" })
+    void testSupportsDomainWithSubdomain(String domain, String attribute, boolean expected) {
+        Map<String, String> config = new HashMap<>();
+        IdentityProviderModel idp = new IdentityProviderModel();
+        idp.setConfig(config);
+        IdentityProviderModelConfig cut = new IdentityProviderModelConfig(idp);
+        config.put(SUBDOMAINS_ATTRIBUTE_KEY, "false");
+        config.put(SUBDOMAINS_ATTRIBUTE_KEY + ".email", "true");
+        // test UPN
+        config.put(DOMAINS_ATTRIBUTE_KEY, "example.com##example.net");
+        config.put(DOMAINS_ATTRIBUTE_KEY + ".email", "example.com##example.net");
+        config.put(DOMAINS_ATTRIBUTE_KEY + ".upn", "example.com##example.net");
+
+        boolean result = cut.supportsDomain(attribute, new Domain(domain));
 
         assertThat(result).isEqualTo(expected);
     }

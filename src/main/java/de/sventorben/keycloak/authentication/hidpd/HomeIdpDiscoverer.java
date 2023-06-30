@@ -40,7 +40,7 @@ final class HomeIdpDiscoverer {
 
         List<IdentityProviderModel> homeIdps = new ArrayList<>();
 
-        final Optional<String> emailDomain;
+        final Optional<Domain> emailDomain;
         UserModel user = context.getUser();
         if (user == null) {
             LOG.tracef("No user found in AuthenticationFlowContext. Extracting domain from provided username '%s'.",
@@ -53,7 +53,7 @@ final class HomeIdpDiscoverer {
         }
 
         if (emailDomain.isPresent()) {
-            String domain = emailDomain.get();
+            Domain domain = emailDomain.get();
             homeIdps = discoverHomeIdps(domain, user, username);
             if (homeIdps.isEmpty()) {
                 LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'",
@@ -66,7 +66,7 @@ final class HomeIdpDiscoverer {
         return homeIdps;
     }
 
-    private List<IdentityProviderModel> discoverHomeIdps(String domain, UserModel user, String username) {
+    private List<IdentityProviderModel> discoverHomeIdps(Domain domain, UserModel user, String username) {
         final Map<String, String> linkedIdps;
 
         HomeIdpDiscoveryConfig config = new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig());
@@ -112,7 +112,7 @@ final class HomeIdpDiscoverer {
         return homeIdps;
     }
 
-    private void logFoundIdps(String idpQualifier, String domainQualifier, List<IdentityProviderModel> homeIdps, String domain, String username) {
+    private void logFoundIdps(String idpQualifier, String domainQualifier, List<IdentityProviderModel> homeIdps, Domain domain, String username) {
         String homeIdpsString = homeIdps.stream()
             .map(IdentityProviderModel::getAlias)
             .collect(Collectors.joining(","));
@@ -126,10 +126,10 @@ final class HomeIdpDiscoverer {
             .collect(Collectors.toList());
     }
 
-    private List<IdentityProviderModel> filterIdpsWithMatchingDomainFrom(List<IdentityProviderModel> enabledIdps, String domain, HomeIdpDiscoveryConfig config) {
+    private List<IdentityProviderModel> filterIdpsWithMatchingDomainFrom(List<IdentityProviderModel> enabledIdps, Domain domain, HomeIdpDiscoveryConfig config) {
         String userAttributeName = config.userAttribute();
         List<IdentityProviderModel> idpsWithMatchingDomain = enabledIdps.stream()
-            .filter(it -> new IdentityProviderModelConfig(it).hasDomain(userAttributeName, domain))
+            .filter(it -> new IdentityProviderModelConfig(it).supportsDomain(userAttributeName, domain))
             .collect(Collectors.toList());
         LOG.tracef("IdPs with matching domain '%s' for attribute '%s': %s", domain, userAttributeName,
             idpsWithMatchingDomain.stream().map(IdentityProviderModel::getAlias).collect(Collectors.joining(",")));
