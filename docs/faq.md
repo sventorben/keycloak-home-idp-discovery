@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Frequently asked questions
+title: FAQ
 nav_order: 6
 ---
 
@@ -11,7 +11,7 @@ nav_order: 6
 {: .no_toc .text-delta }
 
 1. TOC
-   {:toc}
+{:toc}
 
 ---
 
