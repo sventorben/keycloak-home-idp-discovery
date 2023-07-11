@@ -1,10 +1,10 @@
 package de.sventorben.keycloak.authentication.hidpd;
 
+import jakarta.ws.rs.core.UriBuilder;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.forms.login.freemarker.FreeMarkerLoginFormsProvider;
 import org.keycloak.services.resources.LoginActionsService;
 
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 /**

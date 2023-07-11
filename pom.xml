@@ -4,7 +4,7 @@
 
     <groupId>de.sventorben.keycloak</groupId>
     <artifactId>keycloak-home-idp-discovery</artifactId>
-    <version>21.3.1-SNAPSHOT</version>
+    <version>22.0.0-SNAPSHOT</version>
 
     <name>Keycloak: Home IdP Discovery</name>
     <description>A Keycloak authenticator to redirect users to their home IdP</description>
@@ -51,7 +51,7 @@
         <maven.compiler.release>17</maven.compiler.release>
 
         <!-- For compilation -->
-        <version.keycloak>21.1.2</version.keycloak>
+        <version.keycloak>22.0.0</version.keycloak>
 
         <!-- For compatibility tests -->
         <keycloak.version>${version.keycloak}</keycloak.version>
@@ -156,27 +156,6 @@
     <dependencyManagement>
         <dependencies>
 
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-client</artifactId>
-                <version>4.7.4.Final</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jackson2-provider</artifactId>
-                <version>4.7.4.Final</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jaxb-provider</artifactId>
-                <version>4.7.4.Final</version>
-                <scope>test</scope>
-            </dependency>
-
             <!-- Tests -->
             <dependency>
                 <groupId>org.junit</groupId>
@@ -273,7 +252,7 @@
         <dependency>
             <groupId>com.github.dasniko</groupId>
             <artifactId>testcontainers-keycloak</artifactId>
-            <version>2.5.0</version>
+            <version>3.0.0</version>
             <scope>test</scope>
         </dependency>
 

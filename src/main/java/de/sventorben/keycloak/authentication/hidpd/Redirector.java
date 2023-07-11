@@ -1,5 +1,6 @@
 package de.sventorben.keycloak.authentication.hidpd;
 
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.broker.provider.AuthenticationRequest;
@@ -10,12 +11,9 @@ import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakUriInfo;
 import org.keycloak.models.RealmModel;
-import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.services.Urls;
 import org.keycloak.services.managers.ClientSessionCode;
 import org.keycloak.sessions.AuthenticationSessionModel;
-
-import javax.ws.rs.core.Response;
 
 import static org.keycloak.services.resources.IdentityBrokerService.getIdentityProviderFactory;
 
