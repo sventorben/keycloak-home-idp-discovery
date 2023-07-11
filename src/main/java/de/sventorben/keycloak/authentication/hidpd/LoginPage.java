@@ -2,18 +2,12 @@ package de.sventorben.keycloak.authentication.hidpd;
 
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.util.TokenUtil;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import java.util.Set;
 
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_PARAM;
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_VALUE_CONSENT;
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_VALUE_LOGIN;
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_VALUE_SELECT_ACCOUNT;
+import static org.keycloak.protocol.oidc.OIDCLoginProtocol.*;
 import static org.keycloak.protocol.saml.SamlProtocol.SAML_FORCEAUTHN_REQUIREMENT;
 import static org.keycloak.protocol.saml.SamlProtocol.SAML_LOGIN_REQUEST_FORCEAUTHN;
 

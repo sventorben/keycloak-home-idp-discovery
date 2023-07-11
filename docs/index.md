@@ -9,7 +9,7 @@ nav_order: 1
 This is a simple Keycloak authenticator to redirect users to their home identity provider during login.
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sventorben/keycloak-home-idp-discovery?sort=semver)
-![Keycloak Dependency Version](https://img.shields.io/badge/Keycloak-21.1.2-blue)
+![Keycloak Dependency Version](https://img.shields.io/badge/Keycloak-22.0.0-blue)
 ![GitHub Release Date](https://img.shields.io/github/release-date-pre/sventorben/keycloak-home-idp-discovery)
 ![Github Last Commit](https://img.shields.io/github/last-commit/sventorben/keycloak-home-idp-discovery)
 
@@ -18,7 +18,7 @@ This is a simple Keycloak authenticator to redirect users to their home identity
 
 ## What is it good for?
 
-When a federated user wants to login via Keycloak, Keycloak will present a username/password form and a list of configured identity providers to the user. The user needs to choose an identity provider to get redirected.
+When a federated user wants to log in via Keycloak, Keycloak will present a username/password form and a list of configured identity providers to the user. The user needs to choose an identity provider to get redirected.
 This authenticator allows to skip the step of selecting an identity provider.
 
 ## How does it work?
