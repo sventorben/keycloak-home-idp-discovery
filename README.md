@@ -23,3 +23,6 @@ A user can then enter an email address. Keycloak will then choose an identity pr
 ## Documentation
 
 Please refer to the [documentation website](https://sventorben.github.io/keycloak-home-idp-discovery/) for instructions on installation, configuration, features, and general usage.
+
+
+[![Youtube Video - Interview with Niko Köbler](https://img.youtube.com/vi/4jSBqens2yA/0.jpg)](https://www.youtube.com/watch?v=4jSBqens2yA)
