@@ -26,10 +26,6 @@ final class DomainExtractor {
             LOG.warnf("Could not find user attribute '%s' for user '%s'", config.userAttribute(), user.getId());
             return Optional.empty();
         }
-        if (EMAIL_ATTRIBUTE.equalsIgnoreCase(config.userAttribute()) && !user.isEmailVerified()) {
-            LOG.warnf("Email address of user '%s' is not verified", user.getId());
-            return Optional.empty();
-        }
         return extractFrom(userAttribute);
     }
 
