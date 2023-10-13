@@ -58,7 +58,7 @@
 
         <version.mockito>5.6.0</version.mockito>
         <version.testcontainers>1.19.1</version.testcontainers>
-        <version.selenium>4.13.0</version.selenium>
+        <version.selenium>4.14.1</version.selenium>
     </properties>
 
     <build>
