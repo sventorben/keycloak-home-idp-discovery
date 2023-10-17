@@ -11,10 +11,8 @@ import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.services.managers.AuthenticationManager;
 
 import java.util.List;
@@ -90,8 +88,6 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
     }
 
     private String setUserInContext(AuthenticationFlowContext context, String username) {
-        context.clearUser();
-
         username = trimToNull(username);
 
         if (username == null) {
@@ -106,18 +102,6 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         context.getEvent().detail(Details.USERNAME, username);
         context.getAuthenticationSession().setAuthNote(ATTEMPTED_USERNAME, username);
         context.getAuthenticationSession().setClientNote(LOGIN_HINT_PARAM, username);
-
-        try {
-            UserModel user = KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(),
-                username);
-            if (user != null) {
-                LOG.tracef("Setting user '%s' in context", user.getId());
-                context.setUser(user);
-            }
-        } catch (ModelDuplicateException ex) {
-            LOG.warnf(ex, "Could not uniquely identify the user. Multiple users with name or email '%s' found.",
-                username);
-        }
 
         return username;
     }

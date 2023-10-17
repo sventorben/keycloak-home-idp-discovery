@@ -196,6 +196,26 @@
       "realmRoles" : [ "default-roles-test-realm" ],
       "notBefore" : 0,
       "groups" : [ ]
+  }, {
+      "id" : "139020a3-4459-43b1-a92f-d90e5cf093a6",
+      "createdTimestamp" : 1632070461116,
+      "username" : "test6",
+      "enabled" : true,
+      "totp" : false,
+      "email" : "test6@local.local",
+      "emailVerified" : true,
+      "credentials" : [ {
+          "id" : "b7a13463-c361-4893-bae2-a7c28723ba46",
+          "type" : "password",
+          "createdDate" : 1632070469930,
+          "secretData" : "{\"value\":\"f0KV+30selJs9QbGBR/Yl62Eu0fRP2EUudbUEYMLgEdeXrRMKZFMtY3OlfG3W9a6ygNflxj9ysUv4j/RwnMN8g==\",\"salt\":\"ZAaXBhufypfX/dSuy9+Pdg==\",\"additionalParameters\":{}}",
+          "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-test-realm" ],
+      "notBefore" : 0,
+      "groups" : [ ]
   } ],
   "scopeMappings": [
     {
@@ -1721,6 +1741,24 @@
       ]
     },
     {
+      "id": "f8d96ad1-d613-4e49-89d4-cd0adca91291",
+      "alias": "Username & Password",
+      "description": "",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 0,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
       "id": "9e73fe2a-e76e-4ec5-ab63-ef507539e785",
       "alias": "flow-with-alternatives",
       "description": "",
@@ -1858,6 +1896,14 @@
           "flowAlias": "discover home idp",
           "userSetupAllowed": false,
           "autheticatorFlow": true
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "ALTERNATIVE",
+          "priority": 2,
+          "autheticatorFlow": true,
+          "flowAlias": "Username & Password",
+          "userSetupAllowed": false
         }
       ]
     },

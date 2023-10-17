@@ -15,11 +15,12 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 public class TestRealmLoginPage {
 
     private static final String OIDC_AUTH_PATH = "/realms/test-realm/protocol/openid-connect/auth";
+    private static final String LOGIN_ACTIONS_PATH = "/realms/test-realm/login-actions/authenticate";
 
     private final WebDriver webDriver;
     private final String keycloakBaseUrl;
 
-    @FindBy(css = "input[name='username']")
+    @FindBy(css = "input[id='username']")
     private WebElement usernameInput;
 
     @FindBy(css = "input[id='kc-login']")
@@ -35,7 +36,10 @@ public class TestRealmLoginPage {
         this.webDriver = webDriver;
         this.keycloakBaseUrl = keycloakBaseUrl;
         PageFactory.initElements(webDriver, this);
-        assertThat(webDriver.getCurrentUrl()).startsWith(keycloakBaseUrl + OIDC_AUTH_PATH);
+        assertThat(webDriver.getCurrentUrl()).satisfiesAnyOf(
+            it -> assertThat(it).startsWith(keycloakBaseUrl + OIDC_AUTH_PATH),
+            it -> assertThat(it).startsWith(keycloakBaseUrl + LOGIN_ACTIONS_PATH)
+        );
     }
 
     public void signIn(String username) {
@@ -68,6 +72,24 @@ public class TestRealmLoginPage {
     }
 
     public void assertNoInvalidUserMessage() {
-        assertThat(webDriver.findElements(By.id("input-error-username"))).isEmpty();
+        Duration implicitWaitTimeout = webDriver.manage().timeouts().getImplicitWaitTimeout();
+        webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
+        try {
+            assertThat(webDriver.findElements(By.id("input-error-username"))).isEmpty();
+        } finally {
+            webDriver.manage().timeouts().implicitlyWait(implicitWaitTimeout);
+        }
+    }
+
+    public void assertUsernameFieldIsDisplayed() {
+        assertThat(usernameInput.isDisplayed()).isTrue();
+    }
+
+    public void assertUsernameFieldIsPrefilledWith(String username) {
+        assertThat(usernameInput.getAttribute("value")).isEqualTo(username);
+    }
+
+    public void assertPasswordFieldIsDisplayed() {
+        assertThat(webDriver.findElement(By.id("password")).isDisplayed()).isTrue();
     }
 }

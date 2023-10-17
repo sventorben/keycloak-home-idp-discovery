@@ -4,9 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.authentication.AuthenticationFlowContext;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
-import org.mockito.InjectMocks;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -25,8 +25,7 @@ class HomeIdpDiscovererTest {
     @BeforeEach
     void setUp() {
         when(context.getRealm()).thenReturn(mock(RealmModel.class));
-        when(context.getUser()).thenReturn(mock(UserModel.class));
-        cut = new HomeIdpDiscoverer(context);
+        cut = new HomeIdpDiscoverer(context, mock(Users.class));
     }
 
     @Test

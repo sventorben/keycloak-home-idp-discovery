@@ -8,6 +8,7 @@ final class HomeIdpAuthenticationFlowContext {
     private HomeIdpDiscoveryConfig config;
     private LoginPage loginPage;
     private LoginHint loginHint;
+    private Users users;
     private HomeIdpDiscoverer discoverer;
     private RememberMe rememberMe;
     private AuthenticationChallenge authenticationChallenge;
@@ -35,14 +36,21 @@ final class HomeIdpAuthenticationFlowContext {
 
     LoginHint loginHint() {
         if (loginHint == null) {
-            loginHint = new LoginHint(context);
+            loginHint = new LoginHint(context, users());
         }
         return loginHint;
     }
 
+    Users users() {
+        if (users == null) {
+            users = new Users(context);
+        }
+        return users;
+    }
+
     HomeIdpDiscoverer discoverer() {
         if (discoverer == null) {
-            discoverer = new HomeIdpDiscoverer(context);
+            discoverer = new HomeIdpDiscoverer(context, users());
         }
         return  discoverer;
     }
