@@ -274,6 +274,92 @@ class HomeIdpDiscoveryIT {
     }
 
     @Nested
+    @DisplayName("GH-251: Given local user without any forwarding rules")
+    class GivenLocalUser {
+
+        private String username = "test6";
+
+        @BeforeEach
+        public void setUp() {
+            accountConsolePage().signIn();
+            testRealmLoginPage().signIn(username);
+        }
+
+        @Test
+        @DisplayName("then do not redirect")
+        public void willNotRedirectToIdp() {
+            assertNotRedirected();
+        }
+
+        @Test
+        @DisplayName("then do not show invalid user message")
+        public void noInvalidUserMessage() {
+            testRealmLoginPage().assertNoInvalidUserMessage();
+        }
+
+        @Test
+        @DisplayName("then ask for username")
+        public void askForUsername() {
+            testRealmLoginPage().assertUsernameFieldIsDisplayed();
+        }
+
+        @Test
+        @DisplayName("then prefill username field")
+        public void prefilLUsername() {
+            testRealmLoginPage().assertUsernameFieldIsPrefilledWith(username);
+        }
+
+        @Test
+        @DisplayName("then ask for password")
+        public void willAskForPassword() {
+            testRealmLoginPage().assertPasswordFieldIsDisplayed();
+        }
+    }
+
+    @Nested
+    @DisplayName("GH-251: Given non-existing user")
+    class GivenNonExistingUser {
+
+        private String username = "does not exist";
+
+        @BeforeEach
+        public void setUp() {
+            accountConsolePage().signIn();
+            testRealmLoginPage().signIn(username);
+        }
+
+        @Test
+        @DisplayName("then do not redirect")
+        public void willNotRedirectToIdp() {
+            assertNotRedirected();
+        }
+
+        @Test
+        @DisplayName("then do not show invalid user message")
+        public void noInvalidUserMessage() {
+            testRealmLoginPage().assertNoInvalidUserMessage();
+        }
+
+        @Test
+        @DisplayName("then ask for username")
+        public void askForUsername() {
+            testRealmLoginPage().assertUsernameFieldIsDisplayed();
+        }
+
+        @Test
+        @DisplayName("then prefill username field")
+        public void prefilLUsername() {
+            testRealmLoginPage().assertUsernameFieldIsPrefilledWith(username);
+        }
+
+        @Test
+        @DisplayName("then ask for password")
+        public void willAskForPassword() {
+            testRealmLoginPage().assertPasswordFieldIsDisplayed();
+        }
+    }
+
+    @Nested
     @DisplayName("Given user is linked to an IdP already")
     class GivenUserHasIdpLinkConfigured {
 
@@ -287,13 +373,37 @@ class HomeIdpDiscoveryIT {
             public void setUp() {
                 authenticatorConfig.disableForwarding();
                 accountConsolePage().signIn();
+                testRealmLoginPage().signIn(username);
             }
 
             @Test
             @DisplayName("then do not redirect")
             public void willNotRedirectToIdp() {
-                testRealmLoginPage().signIn(username);
                 assertNotRedirected();
+            }
+
+            @Test
+            @DisplayName("GH-251: then do not show invalid user message")
+            public void noInvalidUserMessage() {
+                testRealmLoginPage().assertNoInvalidUserMessage();
+            }
+
+            @Test
+            @DisplayName("GH-251: then ask for username")
+            public void askForUsername() {
+                testRealmLoginPage().assertUsernameFieldIsDisplayed();
+            }
+
+            @Test
+            @DisplayName("GH-251: then prefill username field")
+            public void prefilLUsername() {
+                testRealmLoginPage().assertUsernameFieldIsPrefilledWith(username);
+            }
+
+            @Test
+            @DisplayName("GH-251: then ask for password")
+            public void willAskForPassword() {
+                testRealmLoginPage().assertPasswordFieldIsDisplayed();
             }
         }
 
@@ -355,7 +465,7 @@ class HomeIdpDiscoveryIT {
 
     private void assertNotRedirected() {
         assertRedirectedTo(
-            KEYCLOAK_BASE_URL + "/realms/test-realm/login-actions/authenticate?client_id=account-console");
+            KEYCLOAK_BASE_URL + "/realms/test-realm/login-actions/authenticate");
     }
 
     private void assertRedirectedTo(String url) {

@@ -2,11 +2,7 @@ package de.sventorben.keycloak.authentication.hidpd;
 
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.models.AuthenticatorConfigModel;
-import org.keycloak.models.FederatedIdentityModel;
-import org.keycloak.models.IdentityProviderModel;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.models.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,14 +15,16 @@ final class HomeIdpDiscoverer {
 
     private static final Logger LOG = Logger.getLogger(HomeIdpDiscoverer.class);
 
+    private final Users users;
     private final DomainExtractor domainExtractor;
     private final AuthenticationFlowContext context;
 
-    HomeIdpDiscoverer(AuthenticationFlowContext context) {
-        this(new DomainExtractor(new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig())), context);
+    HomeIdpDiscoverer(AuthenticationFlowContext context, Users users) {
+        this(users, new DomainExtractor(new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig())), context);
     }
 
-    private HomeIdpDiscoverer(DomainExtractor domainExtractor, AuthenticationFlowContext context) {
+    private HomeIdpDiscoverer(Users users, DomainExtractor domainExtractor, AuthenticationFlowContext context) {
+        this.users = users;
         this.domainExtractor = domainExtractor;
         this.context = context;
     }
@@ -41,7 +39,7 @@ final class HomeIdpDiscoverer {
         List<IdentityProviderModel> homeIdps = new ArrayList<>();
 
         final Optional<Domain> emailDomain;
-        UserModel user = context.getUser();
+        UserModel user = users.lookupBy(username);
         if (user == null) {
             LOG.tracef("No user found in AuthenticationFlowContext. Extracting domain from provided username '%s'.",
                 username);
