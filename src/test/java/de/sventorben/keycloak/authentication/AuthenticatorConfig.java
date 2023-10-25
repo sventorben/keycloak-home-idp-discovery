@@ -26,6 +26,18 @@ final class AuthenticatorConfig {
         updateProperty("userAttribute", userAttribute);
     }
 
+    void enableForwardingUnverifiedEmails() {
+        setForwardingUnverifiedEmails(true);
+    }
+
+    void disableForwardingUnverifiedEmails() {
+        setForwardingUnverifiedEmails(false);
+    }
+
+    private void setForwardingUnverifiedEmails(Boolean enabled) {
+        updateProperty("forwardUnverifiedEmail", enabled);
+    }
+
     void enableForwarding() {
         setForwarding(true);
     }
@@ -67,6 +79,7 @@ final class AuthenticatorConfig {
         disableBypassLoginPage();
         setUserAttribute("email");
         enableForwardToFirstMatch();
+        disableForwardingUnverifiedEmails();
     }
 
     private void updateProperty(String propertyName, Boolean enabled) {

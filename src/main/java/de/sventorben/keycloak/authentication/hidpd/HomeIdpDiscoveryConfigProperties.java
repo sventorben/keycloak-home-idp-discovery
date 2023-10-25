@@ -8,6 +8,7 @@ import java.util.List;
 import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.BYPASS_LOGIN_PAGE;
 import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.FORWARD_TO_LINKED_IDP;
 import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.FORWARD_TO_FIRST_MATCH;
+import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.FORWARD_UNVERIFIED_ATTRIBUTE;
 import static de.sventorben.keycloak.authentication.hidpd.HomeIdpDiscoveryConfig.USER_ATTRIBUTE;
 import static org.keycloak.provider.ProviderConfigProperty.BOOLEAN_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
@@ -46,8 +47,17 @@ final class HomeIdpDiscoveryConfigProperties {
         "email",
         false);
 
+    private static final ProviderConfigProperty FORWARD_UNVERIFIED_PROPERTY = new ProviderConfigProperty(
+        FORWARD_UNVERIFIED_ATTRIBUTE,
+        "Forward users with unverified email",
+        "If 'User attribute' is set to 'email', whether to forward existing user if user's email is not verified.",
+        BOOLEAN_TYPE,
+        false,
+        false);
+
     static final List<ProviderConfigProperty> CONFIG_PROPERTIES = ProviderConfigurationBuilder.create()
         .property(USER_ATTRIBUTE_PROPERTY)
+        .property(FORWARD_UNVERIFIED_PROPERTY)
         .property(BYPASS_LOGIN_PAGE_PROPERTY)
         .property(FORWARD_TO_LINKED_IDP_PROPERTY)
         .property(FORWARD_TO_FIRST_MATCH_PROPERTY)

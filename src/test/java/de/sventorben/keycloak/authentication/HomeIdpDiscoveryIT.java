@@ -90,12 +90,30 @@ class HomeIdpDiscoveryIT {
         assertNotRedirected();
     }
 
-    @Test
-    @DisplayName("Given user's email is not verified, do not redirect")
-    public void doNotRedirectIfUserEmailIsNotVerified() {
-        accountConsolePage().signIn();
-        testRealmLoginPage().signIn("test4@example.com");
-        assertNotRedirected();
+    @Nested
+    @DisplayName("Given user's email is not verified")
+    class UnverifiedEmail {
+
+        @BeforeEach
+        void setUp() {
+            accountConsolePage().signIn();
+        }
+
+        @Test
+        @DisplayName("then do not redirect")
+        public void doNotRedirect() {
+            testRealmLoginPage().signIn("test4@example.com");
+            assertNotRedirected();
+        }
+
+        @Test
+        @DisplayName("then redirect if enabled")
+        public void redirectIfEnabled() {
+            authenticatorConfig.enableForwardingUnverifiedEmails();
+            testRealmLoginPage().signIn("test4@example.com");
+            assertRedirectedToIdp();
+        }
+
     }
 
     @Test
@@ -475,6 +493,7 @@ class HomeIdpDiscoveryIT {
     private static RemoteWebDriver setupDriver() {
         RemoteWebDriver driver = BROWSER.getWebDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+        driver.manage().deleteAllCookies();
         return driver;
     }
 
