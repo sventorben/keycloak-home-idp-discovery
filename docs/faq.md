@@ -48,6 +48,9 @@ version [here](https://access.redhat.com/articles/2342881). Above rules apply ;)
 Make sure that your users email is marked as verified. You can enable the `Email verified` flag per user or switch
 on `Trust Email` in the advanced settings of the identity provider.
 
+You can also allow redirecting users with unverified email addresses by switching
+on `Forward users with unverified email` option in the authenticator config.
+
 ## User is not redirected to the correct identity provider. How to analyze the problem?
 
 You may want to increase the log level to see more fine-grained information on how the authenticator discovered the home
