@@ -92,4 +92,8 @@ public class TestRealmLoginPage {
     public void assertPasswordFieldIsDisplayed() {
         assertThat(webDriver.findElement(By.id("password")).isDisplayed()).isTrue();
     }
+
+    public void assertPasswordFieldIsNotDisplayed() {
+        assertThat(webDriver.findElements(By.id("password")).isEmpty()).isTrue();
+    }
 }

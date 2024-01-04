@@ -101,7 +101,6 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         LOG.debugf("Found username '%s' in request", username);
         context.getEvent().detail(Details.USERNAME, username);
         context.getAuthenticationSession().setAuthNote(ATTEMPTED_USERNAME, username);
-        context.getAuthenticationSession().setClientNote(LOGIN_HINT_PARAM, username);
 
         return username;
     }
