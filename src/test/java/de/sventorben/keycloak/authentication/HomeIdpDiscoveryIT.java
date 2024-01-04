@@ -193,7 +193,7 @@ class HomeIdpDiscoveryIT {
         }
 
         @Test
-        @DisplayName("GH-199 - Given no login hint, should not dispaly error message")
+        @DisplayName("GH-199 - Given no login hint, should not display error message")
         public void gh199NoErrorMessage() {
             upstreamIdpMock().redirectToDownstreamWithLoginHint("test", null);
             testRealmLoginPage().assertLoginForClient("test");
@@ -252,11 +252,31 @@ class HomeIdpDiscoveryIT {
                 assertRedirectedToIdp();
             }
 
-            @Test
-            @DisplayName("Given multiple IdPs match, show selection")
-            public void showSelectionIfMultipleIdpsMatch() {
-                upstreamIdpMock().redirectToDownstreamWithLoginHint("test", "test@example.com");
-                selectIdpPage().assertPageTitle();
+            @Nested
+            @DisplayName("and given multiple IdPs match")
+            class GivenMultipleIdpsMatch {
+
+                private String usernameWithMultipleIdps = "test@example.com";
+
+                @Test
+                @DisplayName("then show selection")
+                public void showSelectionIfMultipleIdpsMatch() {
+                    upstreamIdpMock().redirectToDownstreamWithLoginHint("test", usernameWithMultipleIdps);
+                    selectIdpPage().assertPageTitle();
+                }
+
+                @Test
+                @DisplayName("GH-292: when restarting flow then show login page with username")
+                public void whenRestartingFlow() {
+                    upstreamIdpMock().redirectToDownstreamWithLoginHint("test", null);
+                    testRealmLoginPage().signIn(usernameWithMultipleIdps);
+                    String restartUrl = webDriver.getCurrentUrl().replace("/authenticate", "/restart") + "&skip_logout=false";
+                    webDriver.navigate().to(restartUrl);
+
+                    testRealmLoginPage().assertUsernameFieldIsDisplayed();
+                    testRealmLoginPage().assertUsernameFieldIsPrefilledWith("");
+                    testRealmLoginPage().assertPasswordFieldIsNotDisplayed();
+                }
             }
         }
 
