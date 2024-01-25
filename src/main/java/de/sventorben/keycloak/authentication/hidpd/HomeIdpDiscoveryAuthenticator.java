@@ -33,6 +33,11 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
 
         if (context.loginPage().shouldByPass()) {
             String loginHint = trimToNull(context.loginHint().getFromSession());
+
+            final UserModel user = authenticationFlowContext.getAuthenticationSession().getAuthenticatedUser();
+            if (loginHint == null && user != null) {
+                loginHint = trimToNull(user.getEmail());
+            }
             if (loginHint == null) {
                 loginHint = trimToNull(authenticationFlowContext.getAuthenticationSession().getAuthNote(ATTEMPTED_USERNAME));
             }
@@ -44,6 +49,10 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
                     redirectOrChallenge(context, username, homeIdps);
                     return;
                 }
+            }
+            if(user != null) {
+                authenticationFlowContext.attempted();
+                return;
             }
         }
         context.authenticationChallenge().forceChallenge();
