@@ -32,14 +32,10 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
     @Override
     public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
         HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
-
         if (context.loginPage().shouldByPass()) {
-            String loginHint = trimToNull(context.loginHint().getFromSession());
-            if (loginHint == null) {
-                loginHint = trimToNull(authenticationFlowContext.getAuthenticationSession().getAuthNote(ATTEMPTED_USERNAME));
-            }
-            if (loginHint != null) {
-                String username = setUserInContext(authenticationFlowContext, loginHint);
+            String usernameHint = usernameHint(authenticationFlowContext, context);
+            if (usernameHint != null) {
+                String username = setUserInContext(authenticationFlowContext, usernameHint);
                 final List<IdentityProviderModel> homeIdps = context.discoverer(discovererConfig).discoverForUser(authenticationFlowContext, username);
                 if (!homeIdps.isEmpty()) {
                     context.rememberMe().remember(username);
@@ -49,6 +45,14 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             }
         }
         context.authenticationChallenge().forceChallenge();
+    }
+
+    private String usernameHint(AuthenticationFlowContext authenticationFlowContext, HomeIdpAuthenticationFlowContext context) {
+        String usernameHint = trimToNull(context.loginHint().getFromSession());
+        if (usernameHint == null) {
+            usernameHint = trimToNull(authenticationFlowContext.getAuthenticationSession().getAuthNote(ATTEMPTED_USERNAME));
+        }
+        return usernameHint;
     }
 
     private void redirectOrChallenge(HomeIdpAuthenticationFlowContext context, String username, List<IdentityProviderModel> homeIdps) {
@@ -70,13 +74,21 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             return;
         }
 
-        String username = setUserInContext(authenticationFlowContext, formData.getFirst(AuthenticationManager.FORM_USERNAME));
+        HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
+
+        String tryUsername;
+        if (context.reauthentication().required() && authenticationFlowContext.getUser() != null) {
+            tryUsername = authenticationFlowContext.getUser().getUsername();
+        } else {
+            tryUsername = formData.getFirst(AuthenticationManager.FORM_USERNAME);
+        }
+
+        String username = setUserInContext(authenticationFlowContext, tryUsername);
         if (username == null) {
             LOG.debugf("No username in request");
             return;
         }
 
-        HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
 
         final List<IdentityProviderModel> homeIdps = context.discoverer(discovererConfig).discoverForUser(authenticationFlowContext, username);
         if (homeIdps.isEmpty()) {
@@ -107,7 +119,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         return username;
     }
 
-    private String trimToNull(String username) {
+    private static String trimToNull(String username) {
         if (username != null) {
             username = username.trim();
             if ("".equalsIgnoreCase(username))

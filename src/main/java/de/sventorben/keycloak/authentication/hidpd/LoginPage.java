@@ -19,10 +19,12 @@ final class LoginPage {
 
     private final AuthenticationFlowContext context;
     private final HomeIdpForwarderConfig config;
+    private final Reauthentication reauthentication;
 
-    LoginPage(AuthenticationFlowContext context, HomeIdpForwarderConfig config) {
+    LoginPage(AuthenticationFlowContext context, HomeIdpForwarderConfig config, Reauthentication reauthentication) {
         this.context = context;
         this.config = config;
+        this.reauthentication = reauthentication;
     }
 
     boolean shouldByPass() {
@@ -37,6 +39,10 @@ final class LoginPage {
             if (SAML_FORCEAUTHN_REQUIREMENT.equalsIgnoreCase(
                 authenticationSession.getAuthNote(SAML_LOGIN_REQUEST_FORCEAUTHN))) {
                 LOG.debugf("SAML: Forced authentication");
+                return false;
+            }
+            if (reauthentication.required()) {
+                LOG.debugf("Forced, cause reauthentication is required");
                 return false;
             }
         }
