@@ -11,7 +11,7 @@ import static org.keycloak.protocol.oidc.OIDCLoginProtocol.*;
 import static org.keycloak.protocol.saml.SamlProtocol.SAML_FORCEAUTHN_REQUIREMENT;
 import static org.keycloak.protocol.saml.SamlProtocol.SAML_LOGIN_REQUEST_FORCEAUTHN;
 
-class LoginPage {
+final class LoginPage {
 
     private static final Logger LOG = Logger.getLogger(LoginPage.class);
     private static final Set<String> OIDC_PROMPT_NO_BYPASS =
@@ -19,10 +19,12 @@ class LoginPage {
 
     private final AuthenticationFlowContext context;
     private final HomeIdpDiscoveryConfig config;
+    private final Reauthentication reauthentication;
 
-    LoginPage(AuthenticationFlowContext context, HomeIdpDiscoveryConfig config) {
+    LoginPage(AuthenticationFlowContext context, HomeIdpDiscoveryConfig config, Reauthentication reauthentication) {
         this.context = context;
         this.config = config;
+        this.reauthentication = reauthentication;
     }
 
     boolean shouldByPass() {
@@ -37,6 +39,10 @@ class LoginPage {
             if (SAML_FORCEAUTHN_REQUIREMENT.equalsIgnoreCase(
                 authenticationSession.getAuthNote(SAML_LOGIN_REQUEST_FORCEAUTHN))) {
                 LOG.debugf("SAML: Forced authentication");
+                return false;
+            }
+            if (reauthentication.required()) {
+                LOG.debugf("Forced, cause reauthentication is required");
                 return false;
             }
         }
