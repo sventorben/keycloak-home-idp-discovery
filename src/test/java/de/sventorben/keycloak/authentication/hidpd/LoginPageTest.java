@@ -28,6 +28,9 @@ class LoginPageTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     AuthenticationFlowContext context;
 
+    @Mock
+    Reauthentication reauthentication;
+
     @InjectMocks
     LoginPage cut;
 
@@ -63,6 +66,14 @@ class LoginPageTest {
         void givenSamlAuthnIsForcedThenDoNotBypassLogin() {
             given(context.getAuthenticationSession().getAuthNote(SAML_LOGIN_REQUEST_FORCEAUTHN))
                 .willReturn(SAML_FORCEAUTHN_REQUIREMENT);
+            boolean shouldByPass = cut.shouldByPass();
+            assertThat(shouldByPass).isFalse();
+        }
+
+        @Test
+        @DisplayName("and given reauthentication is required, then should not bypass login")
+        void givenReauthenticationIsRequiredThenDoNotBypassLogin() {
+            given(reauthentication.required()).willReturn(true);
             boolean shouldByPass = cut.shouldByPass();
             assertThat(shouldByPass).isFalse();
         }
