@@ -1,47 +1,29 @@
-name: Build and test
+name: Compatibility Matrix
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-    - 'src/**'
-    - '*.xml'
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: 17
-        cache: 'maven'
-    - name: Build
-      run: mvn -B clean package --file pom.xml
-    - name: Integration test
-      run: mvn -B failsafe:integration-test failsafe:verify --file pom.xml
   compatibility:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        keycloak_version: [ 22.0.5, 23.0.0, 23.0.1, 23.0.2, 23.0.3, 23.0.4, 23.0.5, 23.0.6, latest ]
-        experimental: [false]
-        include:
-            - keycloak_version: nightly
-              experimental: true
-    continue-on-error: ${{ matrix.experimental }}
+        keycloak_version: [ 21.0.2, 21.1.2, 22.0.5, 23.0.6, latest, nightly ]
+        extension_version: [ 21.3.0, 22.0.0, 22.1.0, 23.0.0 ]
     steps:
       - uses: actions/checkout@v4
+        with:
+            ref: v${{ matrix.extension_version }}
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
           cache: 'maven'
+      - name: Clean and compile
+        run: mvn -B -U clean test-compile --file pom.xml
+      - name: Download extension
+        run: curl -L -o target/keycloak-restrict-client-auth.jar https://github.com/sventorben/keycloak-restrict-client-auth/releases/download/v${{ matrix.extension_version }}/keycloak-restrict-client-auth.jar
       - name: Compatibility tests
-        run: mvn -B -U clean test-compile failsafe:integration-test failsafe:verify --file pom.xml -Dkeycloak.version=${{ matrix.keycloak_version }}
+        run: mvn -B -U failsafe:integration-test failsafe:verify --file pom.xml -Dkeycloak.version=${{ matrix.keycloak_version }} -DuseJar=true
