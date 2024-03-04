@@ -23,6 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -149,7 +150,14 @@ class HomeIdpDiscoveryIT {
             accountConsolePage().open();
 
             Set<Cookie> cookies = webDriver.manage().getCookies();
-            assertThat(cookies).contains(new Cookie(COOKIE_NAME_REMEMBER_ME, "username:test%40example.com"));
+            assertThat(cookies).anySatisfy(c -> {
+                assertThat(c.getName()).isEqualTo(COOKIE_NAME_REMEMBER_ME);
+                assertThat(c.getValue()).isEqualTo("\"username:test%40example.com\"");
+                assertThat(c.getPath()).isEqualTo("/realms/test-realm/");
+                assertThat(c.getDomain()).isEqualTo("keycloak");
+                assertThat(c.getSameSite()).isEqualTo("Lax");
+                assertThat(c.getExpiry()).isAfter(new Date());
+            });
         }
 
         @Test
