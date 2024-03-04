@@ -23,6 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,7 @@ class HomeIdpDiscoveryIT {
     @Test
     @DisplayName("Given user's email is has a primary managed domain, redirect")
     public void redirectIfUserHasDomain() {
-        accountConsolePage().signIn();
+        accountConsolePage().open();
         testRealmLoginPage().signIn("test@example.com");
         assertRedirectedToIdp();
     }
@@ -77,7 +78,7 @@ class HomeIdpDiscoveryIT {
     @Test
     @DisplayName("Given user's email is has an alternate managed domain, redirect")
     public void redirectIfUserHasAlternateDomain() {
-        accountConsolePage().signIn();
+        accountConsolePage().open();
         testRealmLoginPage().signIn("test2@example.net");
         assertRedirectedToIdp();
     }
@@ -85,7 +86,7 @@ class HomeIdpDiscoveryIT {
     @Test
     @DisplayName("Given user's email has non managed domain, do not redirect")
     public void doNotRedirectIfUserHasNonManagedDomain() {
-        accountConsolePage().signIn();
+        accountConsolePage().open();
         testRealmLoginPage().signIn("test3@example.org");
         assertNotRedirected();
     }
@@ -96,7 +97,7 @@ class HomeIdpDiscoveryIT {
 
         @BeforeEach
         void setUp() {
-            accountConsolePage().signIn();
+            accountConsolePage().open();
         }
 
         @Test
@@ -120,7 +121,7 @@ class HomeIdpDiscoveryIT {
     @DisplayName("Given the user has a matching domain in custom user attribute, redirect")
     public void redirectIfUserHasDomainAsPartOfCustomUserAttribute() {
         authenticatorConfig.setUserAttribute("UPN");
-        accountConsolePage().signIn();
+        accountConsolePage().open();
         testRealmLoginPage().signIn("test4@example.com");
         assertRedirectedToIdp();
     }
@@ -134,7 +135,7 @@ class HomeIdpDiscoveryIT {
         @Test
         @DisplayName("Given the user has checked 'remember me' feature, remember user in cookie")
         public void testUserGetsRemembered() {
-            accountConsolePage().signIn();
+            accountConsolePage().open();
 
             TestRealmLoginPage testRealmLoginPage = testRealmLoginPage();
             testRealmLoginPage.enableRememberMe();
@@ -146,10 +147,17 @@ class HomeIdpDiscoveryIT {
                 .get("139020a3-4459-43b1-a92f-d90e5cf093a1")
                 .logout();
 
-            accountConsolePage().signIn();
+            accountConsolePage().open();
 
             Set<Cookie> cookies = webDriver.manage().getCookies();
-            assertThat(cookies).contains(new Cookie(COOKIE_NAME_REMEMBER_ME, "username:test%40example.com"));
+            assertThat(cookies).anySatisfy(c -> {
+                assertThat(c.getName()).isEqualTo(COOKIE_NAME_REMEMBER_ME);
+                assertThat(c.getValue()).isEqualTo("\"username:test%40example.com\"");
+                assertThat(c.getPath()).isEqualTo("/realms/test-realm/");
+                assertThat(c.getDomain()).isEqualTo("keycloak");
+                assertThat(c.getSameSite()).isEqualTo("Lax");
+                assertThat(c.getExpiry()).isAfter(new Date());
+            });
         }
 
         @Test
@@ -167,7 +175,7 @@ class HomeIdpDiscoveryIT {
                 .get("139020a3-4459-43b1-a92f-d90e5cf093a1")
                 .logout();
 
-            accountConsolePage().signIn();
+            accountConsolePage().open();
 
             Set<Cookie> cookies = webDriver.manage().getCookies();
             assertThat(cookies.stream().map(Cookie::getName).collect(Collectors.toList()))
@@ -286,7 +294,7 @@ class HomeIdpDiscoveryIT {
         @Test
         @DisplayName("Given only one matched IdP, redirect")
         public void redirectIfOnlyOneIdPMatchesDomain() {
-            accountConsolePage().signIn();
+            accountConsolePage().open();
             testRealmLoginPage().signIn("test2@example.net");
             assertRedirectedToIdp();
         }
@@ -294,7 +302,7 @@ class HomeIdpDiscoveryIT {
         @Test
         @DisplayName("Given multiple IdPs match, show selection")
         public void showSelectionIfMultipleIdpsMatch() {
-            accountConsolePage().signIn();
+            accountConsolePage().open();
             testRealmLoginPage().signIn("test@example.com");
             selectIdpPage().assertOnPage();
         }
@@ -303,7 +311,7 @@ class HomeIdpDiscoveryIT {
         @DisplayName("Given multiple IdPs match, when selecting one, redirects")
         public void redirectToIdpAfterSelection() {
             String idpAlias = "keycloak-oidc2";
-            accountConsolePage().signIn();
+            accountConsolePage().open();
             testRealmLoginPage().signIn("test@example.com");
             selectIdpPage().selectIdp(idpAlias);
             assertRedirectedToIdp(idpAlias);
@@ -319,7 +327,7 @@ class HomeIdpDiscoveryIT {
 
         @BeforeEach
         public void setUp() {
-            accountConsolePage().signIn();
+            accountConsolePage().open();
             testRealmLoginPage().signIn(username);
         }
 
@@ -362,7 +370,7 @@ class HomeIdpDiscoveryIT {
 
         @BeforeEach
         public void setUp() {
-            accountConsolePage().signIn();
+            accountConsolePage().open();
             testRealmLoginPage().signIn(username);
         }
 
@@ -410,7 +418,7 @@ class HomeIdpDiscoveryIT {
             @BeforeEach
             public void setUp() {
                 authenticatorConfig.disableForwarding();
-                accountConsolePage().signIn();
+                accountConsolePage().open();
                 testRealmLoginPage().signIn(username);
             }
 
@@ -452,7 +460,7 @@ class HomeIdpDiscoveryIT {
             @BeforeEach
             public void setUp() {
                 authenticatorConfig.enableForwarding();
-                accountConsolePage().signIn();
+                accountConsolePage().open();
             }
 
             @Test
