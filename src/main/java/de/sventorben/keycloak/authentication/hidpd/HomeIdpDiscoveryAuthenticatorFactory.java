@@ -1,5 +1,6 @@
 package de.sventorben.keycloak.authentication.hidpd;
 
+import de.sventorben.keycloak.authentication.hidpd.discovery.email.HomeIdpDiscoveryConfigProperties;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
@@ -10,9 +11,10 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ServerInfoAwareProviderFactory;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.keycloak.models.AuthenticationExecutionModel.Requirement.*;
 
@@ -58,7 +60,10 @@ public final class HomeIdpDiscoveryAuthenticatorFactory implements Authenticator
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        return HomeIdpDiscoveryConfigProperties.CONFIG_PROPERTIES;
+        return Stream.concat(
+            HomeIdpForwarderConfigProperties.CONFIG_PROPERTIES.stream(),
+            HomeIdpDiscoveryConfigProperties.CONFIG_PROPERTIES.stream())
+            .collect(Collectors.toList());
     }
 
     @Override

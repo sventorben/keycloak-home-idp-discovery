@@ -1,4 +1,4 @@
-package de.sventorben.keycloak.authentication.hidpd;
+package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
 import org.keycloak.models.Constants;
 import org.keycloak.models.IdentityProviderModel;

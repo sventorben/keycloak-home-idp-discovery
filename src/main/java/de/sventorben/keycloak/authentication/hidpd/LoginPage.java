@@ -11,16 +11,16 @@ import static org.keycloak.protocol.oidc.OIDCLoginProtocol.*;
 import static org.keycloak.protocol.saml.SamlProtocol.SAML_FORCEAUTHN_REQUIREMENT;
 import static org.keycloak.protocol.saml.SamlProtocol.SAML_LOGIN_REQUEST_FORCEAUTHN;
 
-class LoginPage {
+final class LoginPage {
 
     private static final Logger LOG = Logger.getLogger(LoginPage.class);
     private static final Set<String> OIDC_PROMPT_NO_BYPASS =
         Set.of(PROMPT_VALUE_LOGIN, PROMPT_VALUE_CONSENT, PROMPT_VALUE_SELECT_ACCOUNT);
 
     private final AuthenticationFlowContext context;
-    private final HomeIdpDiscoveryConfig config;
+    private final HomeIdpForwarderConfig config;
 
-    LoginPage(AuthenticationFlowContext context, HomeIdpDiscoveryConfig config) {
+    LoginPage(AuthenticationFlowContext context, HomeIdpForwarderConfig config) {
         this.context = context;
         this.config = config;
     }

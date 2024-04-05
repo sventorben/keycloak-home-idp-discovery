@@ -1,14 +1,14 @@
 package de.sventorben.keycloak.authentication.hidpd;
 
+import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscoverer;
 import org.keycloak.authentication.AuthenticationFlowContext;
 
 final class HomeIdpAuthenticationFlowContext {
 
     private final AuthenticationFlowContext context;
-    private HomeIdpDiscoveryConfig config;
+    private HomeIdpForwarderConfig config;
     private LoginPage loginPage;
     private LoginHint loginHint;
-    private Users users;
     private HomeIdpDiscoverer discoverer;
     private RememberMe rememberMe;
     private AuthenticationChallenge authenticationChallenge;
@@ -20,9 +20,9 @@ final class HomeIdpAuthenticationFlowContext {
         this.context = context;
     }
 
-    HomeIdpDiscoveryConfig config() {
+    HomeIdpForwarderConfig config() {
         if (config == null) {
-            config = new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig());
+            config = new HomeIdpForwarderConfig(context.getAuthenticatorConfig());
         }
         return config;
     }
@@ -36,21 +36,14 @@ final class HomeIdpAuthenticationFlowContext {
 
     LoginHint loginHint() {
         if (loginHint == null) {
-            loginHint = new LoginHint(context, users());
+            loginHint = new LoginHint(context, new Users(context.getSession()));
         }
         return loginHint;
     }
 
-    Users users() {
-        if (users == null) {
-            users = new Users(context);
-        }
-        return users;
-    }
-
     HomeIdpDiscoverer discoverer() {
         if (discoverer == null) {
-            discoverer = new HomeIdpDiscoverer(context, users());
+            discoverer = context.getSession().getProvider(HomeIdpDiscoverer.class, "email");
         }
         return  discoverer;
     }

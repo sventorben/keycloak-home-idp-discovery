@@ -1,8 +1,8 @@
-package de.sventorben.keycloak.authentication.hidpd;
+package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
 import java.util.Objects;
 
-class Domain {
+final class Domain {
 
     private final String value;
 
