@@ -17,7 +17,6 @@ import org.keycloak.services.managers.AuthenticationManager;
 
 import java.util.List;
 
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.LOGIN_HINT_PARAM;
 import static org.keycloak.services.validation.Validation.FIELD_USERNAME;
 
 final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthenticator {
@@ -38,7 +37,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             }
             if (loginHint != null) {
                 String username = setUserInContext(authenticationFlowContext, loginHint);
-                final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(username);
+                final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(authenticationFlowContext, username);
                 if (!homeIdps.isEmpty()) {
                     context.rememberMe().remember(username);
                     redirectOrChallenge(context, username, homeIdps);
@@ -76,7 +75,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
 
         HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
 
-        final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(username);
+        final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(authenticationFlowContext, username);
         if (homeIdps.isEmpty()) {
             authenticationFlowContext.attempted();
         } else {

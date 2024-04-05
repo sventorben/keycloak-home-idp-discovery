@@ -1,25 +1,25 @@
 package de.sventorben.keycloak.authentication.hidpd;
 
 import org.jboss.logging.Logger;
-import org.keycloak.authentication.AuthenticationFlowContext;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 
-final class Users {
+public final class Users {
 
     private static final Logger LOG = Logger.getLogger(Users.class);
 
-    private final AuthenticationFlowContext context;
+    private final KeycloakSession keycloakSession;
 
-    Users(AuthenticationFlowContext context) {
-        this.context = context;
+    public Users(KeycloakSession keycloakSession) {
+        this.keycloakSession = keycloakSession;
     }
 
-    UserModel lookupBy(String username) {
+    public UserModel lookupBy(String username) {
         UserModel user = null;
         try {
-            user = KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(), username);
+            user = KeycloakModelUtils.findUserByNameOrEmail(keycloakSession, keycloakSession.getContext().getRealm(), username);
         } catch (ModelDuplicateException ex) {
             LOG.warnf(ex, "Could not uniquely identify the user. Multiple users with name or email '%s' found.", username);
         }

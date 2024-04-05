@@ -10,7 +10,7 @@ final class RememberMe {
 
     private final AuthenticationFlowContext context;
 
-    public RememberMe(AuthenticationFlowContext context) {
+    RememberMe(AuthenticationFlowContext context) {
         this.context = context;
     }
 

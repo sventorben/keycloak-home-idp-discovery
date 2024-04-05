@@ -14,10 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_PARAM;
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_VALUE_CONSENT;
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_VALUE_LOGIN;
-import static org.keycloak.protocol.oidc.OIDCLoginProtocol.PROMPT_VALUE_SELECT_ACCOUNT;
+import static org.keycloak.protocol.oidc.OIDCLoginProtocol.*;
 import static org.keycloak.protocol.saml.SamlProtocol.SAML_FORCEAUTHN_REQUIREMENT;
 import static org.keycloak.protocol.saml.SamlProtocol.SAML_LOGIN_REQUEST_FORCEAUTHN;
 import static org.mockito.BDDMockito.given;
@@ -26,7 +23,7 @@ import static org.mockito.BDDMockito.given;
 class LoginPageTest {
 
     @Mock
-    HomeIdpDiscoveryConfig config;
+    HomeIdpForwarderConfig config;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     AuthenticationFlowContext context;

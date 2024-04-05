@@ -1,5 +1,7 @@
-package de.sventorben.keycloak.authentication.hidpd;
+package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
+import de.sventorben.keycloak.authentication.hidpd.discovery.email.Domain;
+import de.sventorben.keycloak.authentication.hidpd.discovery.email.IdentityProviderModelConfig;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.keycloak.models.IdentityProviderModel;

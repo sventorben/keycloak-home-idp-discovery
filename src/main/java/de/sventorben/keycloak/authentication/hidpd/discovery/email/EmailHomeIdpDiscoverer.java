@@ -1,35 +1,27 @@
-package de.sventorben.keycloak.authentication.hidpd;
+package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
+import de.sventorben.keycloak.authentication.hidpd.Users;
+import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscoverer;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-final class HomeIdpDiscoverer {
+final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
 
-    private static final Logger LOG = Logger.getLogger(HomeIdpDiscoverer.class);
-
+    private static final Logger LOG = Logger.getLogger(EmailHomeIdpDiscoverer.class);
     private final Users users;
-    private final DomainExtractor domainExtractor;
-    private final AuthenticationFlowContext context;
 
-    HomeIdpDiscoverer(AuthenticationFlowContext context, Users users) {
-        this(users, new DomainExtractor(new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig())), context);
-    }
-
-    private HomeIdpDiscoverer(Users users, DomainExtractor domainExtractor, AuthenticationFlowContext context) {
+    EmailHomeIdpDiscoverer(Users users) {
         this.users = users;
-        this.domainExtractor = domainExtractor;
-        this.context = context;
     }
 
-    public List<IdentityProviderModel> discoverForUser(String username) {
+    @Override
+    public List<IdentityProviderModel> discoverForUser(AuthenticationFlowContext context, String username) {
+
+        DomainExtractor domainExtractor = new DomainExtractor(new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig()));
 
         String realmName = context.getRealm().getName();
         AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
@@ -52,7 +44,7 @@ final class HomeIdpDiscoverer {
 
         if (emailDomain.isPresent()) {
             Domain domain = emailDomain.get();
-            homeIdps = discoverHomeIdps(domain, user, username);
+            homeIdps = discoverHomeIdps(context, domain, user, username);
             if (homeIdps.isEmpty()) {
                 LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'",
                     domain, username, realmName);
@@ -64,7 +56,7 @@ final class HomeIdpDiscoverer {
         return homeIdps;
     }
 
-    private List<IdentityProviderModel> discoverHomeIdps(Domain domain, UserModel user, String username) {
+    private List<IdentityProviderModel> discoverHomeIdps(AuthenticationFlowContext context, Domain domain, UserModel user, String username) {
         final Map<String, String> linkedIdps;
 
         HomeIdpDiscoveryConfig config = new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig());
@@ -83,7 +75,7 @@ final class HomeIdpDiscoverer {
                     Collectors.toMap(FederatedIdentityModel::getIdentityProvider, FederatedIdentityModel::getUserName));
         }
 
-        List<IdentityProviderModel> enabledIdps = determineEnabledIdps();
+        List<IdentityProviderModel> enabledIdps = determineEnabledIdps(context);
         List<IdentityProviderModel> enabledIdpsWithMatchingDomain = filterIdpsWithMatchingDomainFrom(enabledIdps,
             domain,
             config);
@@ -134,7 +126,7 @@ final class HomeIdpDiscoverer {
         return idpsWithMatchingDomain;
     }
 
-    private List<IdentityProviderModel> determineEnabledIdps() {
+    private List<IdentityProviderModel> determineEnabledIdps(AuthenticationFlowContext context) {
         RealmModel realm = context.getRealm();
         List<IdentityProviderModel> enabledIdps = realm.getIdentityProvidersStream()
             .filter(IdentityProviderModel::isEnabled)
@@ -145,4 +137,7 @@ final class HomeIdpDiscoverer {
         return enabledIdps;
     }
 
+    @Override
+    public void close() {
+    }
 }

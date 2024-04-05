@@ -1,4 +1,4 @@
-package de.sventorben.keycloak.authentication.hidpd;
+package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
 import org.jboss.logging.Logger;
 import org.keycloak.models.UserModel;
