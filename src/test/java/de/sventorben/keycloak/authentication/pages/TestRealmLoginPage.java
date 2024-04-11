@@ -36,9 +36,20 @@ public class TestRealmLoginPage {
         this.webDriver = webDriver;
         this.keycloakBaseUrl = keycloakBaseUrl;
         PageFactory.initElements(webDriver, this);
+        waitForLoginPage();
         assertThat(webDriver.getCurrentUrl()).satisfiesAnyOf(
             it -> assertThat(it).startsWith(keycloakBaseUrl + OIDC_AUTH_PATH),
             it -> assertThat(it).startsWith(keycloakBaseUrl + LOGIN_ACTIONS_PATH)
+        );
+    }
+
+    private void waitForLoginPage() {
+        new WebDriverWait(webDriver, Duration.ofSeconds(5))
+            .until((driver) -> {
+                String currentUrl = driver.getCurrentUrl();
+                return currentUrl.startsWith(keycloakBaseUrl + OIDC_AUTH_PATH)
+                    || currentUrl.startsWith(keycloakBaseUrl + LOGIN_ACTIONS_PATH);
+            }
         );
     }
 
@@ -91,5 +102,9 @@ public class TestRealmLoginPage {
 
     public void assertPasswordFieldIsDisplayed() {
         assertThat(webDriver.findElement(By.id("password")).isDisplayed()).isTrue();
+    }
+
+    public void assertPasswordFieldIsNotDisplayed() {
+        assertThat(webDriver.findElements(By.id("password")).isEmpty()).isTrue();
     }
 }

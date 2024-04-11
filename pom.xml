@@ -4,7 +4,7 @@
 
     <groupId>de.sventorben.keycloak</groupId>
     <artifactId>keycloak-home-idp-discovery</artifactId>
-    <version>23.0.1-SNAPSHOT</version>
+    <version>24.0.1-SNAPSHOT</version>
 
     <name>Keycloak: Home IdP Discovery</name>
     <description>A Keycloak authenticator to redirect users to their home IdP</description>
@@ -51,14 +51,14 @@
         <maven.compiler.release>17</maven.compiler.release>
 
         <!-- For compilation -->
-        <version.keycloak>23.0.4</version.keycloak>
+        <version.keycloak>24.0.2</version.keycloak>
 
         <!-- For compatibility tests -->
         <keycloak.version>${version.keycloak}</keycloak.version>
 
-        <version.mockito>5.10.0</version.mockito>
-        <version.testcontainers>1.19.3</version.testcontainers>
-        <version.selenium>4.15.0</version.selenium>
+        <version.mockito>5.11.0</version.mockito>
+        <version.testcontainers>1.19.7</version.testcontainers>
+        <version.selenium>4.18.1</version.selenium>
     </properties>
 
     <build>
@@ -116,7 +116,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.1</version>
+                <version>3.13.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -160,7 +160,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.10.1</version>
+                <version>5.10.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -221,7 +221,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.25.2</version>
+            <version>3.25.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -252,7 +252,7 @@
         <dependency>
             <groupId>com.github.dasniko</groupId>
             <artifactId>testcontainers-keycloak</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -266,13 +266,13 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.22.1</version>
+            <version>2.23.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j18-impl</artifactId>
-            <version>2.18.0</version>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>2.23.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
