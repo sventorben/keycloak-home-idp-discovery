@@ -22,7 +22,9 @@ import java.util.List;
  * </p>
  *
  * @see IdentityProviderModel
+ * @see AuthenticationFlowContext
  */
+@Unstable
 public interface HomeIdpDiscoverer extends Provider {
 
     /**
