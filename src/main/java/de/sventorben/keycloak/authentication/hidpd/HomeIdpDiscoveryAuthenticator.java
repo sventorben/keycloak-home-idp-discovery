@@ -23,7 +23,10 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
 
     private static final Logger LOG = Logger.getLogger(HomeIdpDiscoveryAuthenticator.class);
 
-    HomeIdpDiscoveryAuthenticator() {
+    private final AbstractHomeIdpDiscoveryAuthenticatorFactory.DiscovererConfig discovererConfig;
+
+    HomeIdpDiscoveryAuthenticator(AbstractHomeIdpDiscoveryAuthenticatorFactory.DiscovererConfig discovererConfig) {
+        this.discovererConfig = discovererConfig;
     }
 
     @Override
@@ -37,7 +40,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
             }
             if (loginHint != null) {
                 String username = setUserInContext(authenticationFlowContext, loginHint);
-                final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(authenticationFlowContext, username);
+                final List<IdentityProviderModel> homeIdps = context.discoverer(discovererConfig).discoverForUser(authenticationFlowContext, username);
                 if (!homeIdps.isEmpty()) {
                     context.rememberMe().remember(username);
                     redirectOrChallenge(context, username, homeIdps);
@@ -75,7 +78,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
 
         HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
 
-        final List<IdentityProviderModel> homeIdps = context.discoverer().discoverForUser(authenticationFlowContext, username);
+        final List<IdentityProviderModel> homeIdps = context.discoverer(discovererConfig).discoverForUser(authenticationFlowContext, username);
         if (homeIdps.isEmpty()) {
             authenticationFlowContext.attempted();
         } else {
