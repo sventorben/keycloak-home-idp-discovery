@@ -19,6 +19,12 @@ import static org.keycloak.models.AuthenticationExecutionModel.Requirement.*;
 public abstract class AbstractHomeIdpDiscoveryAuthenticatorFactory implements AuthenticatorFactory, ServerInfoAwareProviderFactory {
     private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = new AuthenticationExecutionModel.Requirement[]{REQUIRED, ALTERNATIVE, DISABLED};
 
+    private final DiscovererConfig discovererConfig;
+
+    protected AbstractHomeIdpDiscoveryAuthenticatorFactory(DiscovererConfig discovererConfig) {
+        this.discovererConfig = discovererConfig;
+    }
+
     @Override
     public final boolean isConfigurable() {
         return true;
@@ -38,15 +44,13 @@ public abstract class AbstractHomeIdpDiscoveryAuthenticatorFactory implements Au
     public final List<ProviderConfigProperty> getConfigProperties() {
         return Stream.concat(
             HomeIdpForwarderConfigProperties.CONFIG_PROPERTIES.stream(),
-            getDiscovererConfig().getProperties().stream())
+            discovererConfig.getProperties().stream())
             .collect(Collectors.toList());
     }
 
-    abstract DiscovererConfig getDiscovererConfig();
-
     @Override
     public final Authenticator create(KeycloakSession session) {
-        return new HomeIdpDiscoveryAuthenticator(getDiscovererConfig());
+        return new HomeIdpDiscoveryAuthenticator(discovererConfig);
     }
 
     @Override

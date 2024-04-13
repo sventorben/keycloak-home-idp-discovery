@@ -1,13 +1,14 @@
 package de.sventorben.keycloak.authentication.hidpd;
 
 import de.sventorben.keycloak.authentication.hidpd.discovery.email.EmailHomeIdpDiscoveryAuthenticatorFactoryDiscovererConfig;
-import org.keycloak.Config;
 
 public final class HomeIdpDiscoveryAuthenticatorFactory extends AbstractHomeIdpDiscoveryAuthenticatorFactory {
 
     private static final String PROVIDER_ID = "home-idp-discovery";
 
-    private Config.Scope config;
+    public HomeIdpDiscoveryAuthenticatorFactory() {
+        super(new EmailHomeIdpDiscoveryAuthenticatorFactoryDiscovererConfig());
+    }
 
     @Override
     public String getDisplayType() {
@@ -22,11 +23,6 @@ public final class HomeIdpDiscoveryAuthenticatorFactory extends AbstractHomeIdpD
     @Override
     public String getHelpText() {
         return "Redirects users to their home identity provider";
-    }
-
-    @Override
-    DiscovererConfig getDiscovererConfig() {
-        return new EmailHomeIdpDiscoveryAuthenticatorFactoryDiscovererConfig();
     }
 
     @Override
