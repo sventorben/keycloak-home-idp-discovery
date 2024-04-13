@@ -1,5 +1,6 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.spi;
 
+import de.sventorben.keycloak.authentication.hidpd.PublicAPI;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.provider.Provider;
@@ -24,7 +25,7 @@ import java.util.List;
  * @see IdentityProviderModel
  * @see AuthenticationFlowContext
  */
-@Unstable
+@PublicAPI(unstable = true)
 public interface HomeIdpDiscoverer extends Provider {
 
     /**

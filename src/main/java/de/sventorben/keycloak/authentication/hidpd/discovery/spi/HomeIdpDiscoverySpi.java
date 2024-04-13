@@ -4,7 +4,6 @@ import org.keycloak.provider.Provider;
 import org.keycloak.provider.ProviderFactory;
 import org.keycloak.provider.Spi;
 
-@Unstable
 public final class HomeIdpDiscoverySpi implements Spi {
 
     private static final String SPI_NAME = "hidpd-discovery";

@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import static org.keycloak.models.AuthenticationExecutionModel.Requirement.*;
 
+@PublicAPI(unstable = true)
 public abstract class AbstractHomeIdpDiscoveryAuthenticatorFactory implements AuthenticatorFactory, ServerInfoAwareProviderFactory {
     private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = new AuthenticationExecutionModel.Requirement[]{REQUIRED, ALTERNATIVE, DISABLED};
 
@@ -43,8 +44,8 @@ public abstract class AbstractHomeIdpDiscoveryAuthenticatorFactory implements Au
     @Override
     public final List<ProviderConfigProperty> getConfigProperties() {
         return Stream.concat(
-            HomeIdpForwarderConfigProperties.CONFIG_PROPERTIES.stream(),
-            discovererConfig.getProperties().stream())
+                HomeIdpForwarderConfigProperties.CONFIG_PROPERTIES.stream(),
+                discovererConfig.getProperties().stream())
             .collect(Collectors.toList());
     }
 
