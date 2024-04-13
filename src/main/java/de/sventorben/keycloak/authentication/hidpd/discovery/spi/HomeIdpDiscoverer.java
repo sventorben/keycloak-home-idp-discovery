@@ -22,6 +22,8 @@ import java.util.List;
  * respective IdP for authentication.
  * </p>
  *
+ * @apiNote This interface is part of the public API, but is currently unstable and may change in future releases.
+ *
  * @see IdentityProviderModel
  * @see AuthenticationFlowContext
  */
