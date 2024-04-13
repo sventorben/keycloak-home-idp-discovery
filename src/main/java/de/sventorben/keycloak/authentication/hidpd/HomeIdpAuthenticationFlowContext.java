@@ -41,9 +41,9 @@ final class HomeIdpAuthenticationFlowContext {
         return loginHint;
     }
 
-    HomeIdpDiscoverer discoverer() {
+    HomeIdpDiscoverer discoverer(AbstractHomeIdpDiscoveryAuthenticatorFactory.DiscovererConfig discovererConfig) {
         if (discoverer == null) {
-            discoverer = context.getSession().getProvider(HomeIdpDiscoverer.class, "email");
+            discoverer = context.getSession().getProvider(HomeIdpDiscoverer.class, discovererConfig.getProviderId());
         }
         return  discoverer;
     }

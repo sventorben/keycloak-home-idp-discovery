@@ -1,1 +1,1 @@
-de.sventorben.keycloak.authentication.hidpd.discovery.email.EmailDefaultHomeIdpDiscovererFactory
+de.sventorben.keycloak.authentication.hidpd.discovery.email.EmailHomeIdpDiscovererFactory

@@ -7,9 +7,9 @@ import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
-public final class EmailDefaultHomeIdpDiscovererFactory implements HomeIdpDiscovererFactory {
+public final class EmailHomeIdpDiscovererFactory implements HomeIdpDiscovererFactory {
 
-    private static final String PROVIDER_ID = "email";
+    static final String PROVIDER_ID = "email";
 
     @Override
     public HomeIdpDiscoverer create(KeycloakSession keycloakSession) {

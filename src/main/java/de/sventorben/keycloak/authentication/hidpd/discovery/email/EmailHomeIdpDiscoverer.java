@@ -4,7 +4,10 @@ import de.sventorben.keycloak.authentication.hidpd.Users;
 import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscoverer;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.models.*;
+import org.keycloak.models.FederatedIdentityModel;
+import org.keycloak.models.IdentityProviderModel;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,12 +24,12 @@ final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
     @Override
     public List<IdentityProviderModel> discoverForUser(AuthenticationFlowContext context, String username) {
 
-        DomainExtractor domainExtractor = new DomainExtractor(new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig()));
+        EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
+        DomainExtractor domainExtractor = new DomainExtractor(config);
 
         String realmName = context.getRealm().getName();
-        AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
         LOG.tracef("Trying to discover home IdP for username '%s' in realm '%s' with authenticator config '%s'",
-            username, realmName, authenticatorConfig == null ? "<unconfigured>" : authenticatorConfig.getAlias());
+            username, realmName, config.getAlias());
 
         List<IdentityProviderModel> homeIdps = new ArrayList<>();
 
@@ -59,7 +62,7 @@ final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
     private List<IdentityProviderModel> discoverHomeIdps(AuthenticationFlowContext context, Domain domain, UserModel user, String username) {
         final Map<String, String> linkedIdps;
 
-        HomeIdpDiscoveryConfig config = new HomeIdpDiscoveryConfig(context.getAuthenticatorConfig());
+        EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
         if (user == null || !config.forwardToLinkedIdp()) {
             linkedIdps = Collections.emptyMap();
             LOG.tracef(
@@ -116,7 +119,7 @@ final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
             .collect(Collectors.toList());
     }
 
-    private List<IdentityProviderModel> filterIdpsWithMatchingDomainFrom(List<IdentityProviderModel> enabledIdps, Domain domain, HomeIdpDiscoveryConfig config) {
+    private List<IdentityProviderModel> filterIdpsWithMatchingDomainFrom(List<IdentityProviderModel> enabledIdps, Domain domain, EmailHomeIdpDiscovererConfig config) {
         String userAttributeName = config.userAttribute();
         List<IdentityProviderModel> idpsWithMatchingDomain = enabledIdps.stream()
             .filter(it -> new IdentityProviderModelConfig(it).supportsDomain(userAttributeName, domain))
