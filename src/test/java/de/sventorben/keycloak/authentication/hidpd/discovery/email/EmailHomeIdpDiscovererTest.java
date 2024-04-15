@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.RealmModel;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -25,13 +24,13 @@ class EmailHomeIdpDiscovererTest {
     @BeforeEach
     void setUp() {
         when(context.getRealm()).thenReturn(mock(RealmModel.class));
-        cut = new EmailHomeIdpDiscoverer(Mockito.mock(Users.class));
+        cut = new EmailHomeIdpDiscoverer(mock(Users.class), mock(IdentityProviders.class));
     }
 
     @Test
     void doesNotThrowExceptionWhenNotConfigured() {
         when(context.getAuthenticatorConfig()).thenReturn(null);
-        assertThatCode(() -> cut.discoverForUser(context,"test"))
+        assertThatCode(() -> cut.discoverForUser(context, "test"))
             .doesNotThrowAnyException();
     }
 
