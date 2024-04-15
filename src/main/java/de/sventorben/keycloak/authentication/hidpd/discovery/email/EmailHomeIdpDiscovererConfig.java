@@ -10,7 +10,7 @@ import java.util.Optional;
 import static org.keycloak.provider.ProviderConfigProperty.BOOLEAN_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
-public final class EmailHomeIdpDiscovererConfig {
+final class EmailHomeIdpDiscovererConfig {
 
     private static final String FORWARD_TO_LINKED_IDP = "forwardToLinkedIdp";
     private static final String USER_ATTRIBUTE = "userAttribute";

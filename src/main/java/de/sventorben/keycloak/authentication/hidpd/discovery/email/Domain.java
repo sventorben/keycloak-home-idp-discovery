@@ -1,8 +1,11 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
+import de.sventorben.keycloak.authentication.hidpd.PublicAPI;
+
 import java.util.Objects;
 
-final class Domain {
+@PublicAPI(unstable = true)
+public final class Domain {
 
     private final String value;
 
@@ -13,6 +16,10 @@ final class Domain {
 
     boolean isSubDomainOf(Domain domain) {
         return this.value.endsWith("." + domain.value);
+    }
+
+    public String getRawValue() {
+        return this.value;
     }
 
     @Override

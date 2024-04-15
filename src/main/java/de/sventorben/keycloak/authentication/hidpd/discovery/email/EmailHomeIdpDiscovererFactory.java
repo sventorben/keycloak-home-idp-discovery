@@ -13,7 +13,7 @@ public final class EmailHomeIdpDiscovererFactory implements HomeIdpDiscovererFac
 
     @Override
     public HomeIdpDiscoverer create(KeycloakSession keycloakSession) {
-        return new EmailHomeIdpDiscoverer(new Users(keycloakSession));
+        return new EmailHomeIdpDiscoverer(new Users(keycloakSession), new DefaultIdentityProviders());
     }
 
     @Override
