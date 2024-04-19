@@ -51,14 +51,14 @@
         <maven.compiler.release>17</maven.compiler.release>
 
         <!-- For compilation -->
-        <version.keycloak>24.0.2</version.keycloak>
+        <version.keycloak>24.0.3</version.keycloak>
 
         <!-- For compatibility tests -->
         <keycloak.version>${version.keycloak}</keycloak.version>
 
         <version.mockito>5.11.0</version.mockito>
         <version.testcontainers>1.19.7</version.testcontainers>
-        <version.selenium>4.18.1</version.selenium>
+        <version.selenium>4.19.1</version.selenium>
     </properties>
 
     <build>
@@ -121,7 +121,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.0</version>
                 <configuration>
                     <archive>
                         <manifestFile>src${file.separator}main${file.separator}resources${file.separator}META-INF${file.separator}MANIFEST.MF</manifestFile>
@@ -134,7 +134,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
