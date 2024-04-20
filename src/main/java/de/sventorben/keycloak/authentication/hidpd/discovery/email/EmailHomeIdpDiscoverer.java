@@ -84,7 +84,7 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
                     Collectors.toMap(FederatedIdentityModel::getIdentityProvider, FederatedIdentityModel::getUserName));
         }
 
-        List<IdentityProviderModel> candidateIdps = identityProviders.candidatesForHomeIdp(context);
+        List<IdentityProviderModel> candidateIdps = identityProviders.candidatesForHomeIdp(context, user);
         if (candidateIdps == null) {
             candidateIdps = emptyList();
         }

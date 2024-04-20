@@ -1,7 +1,8 @@
-package de.sventorben.keycloak.authentication.hidpd.discovery.email;
+package de.sventorben.keycloak.authentication.hidpd.discovery.orgs.email;
 
 import de.sventorben.keycloak.authentication.hidpd.OperationalInfo;
 import de.sventorben.keycloak.authentication.hidpd.Users;
+import de.sventorben.keycloak.authentication.hidpd.discovery.email.EmailHomeIdpDiscoverer;
 import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscoverer;
 import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscovererFactory;
 import org.keycloak.Config;
@@ -11,13 +12,13 @@ import org.keycloak.provider.ServerInfoAwareProviderFactory;
 
 import java.util.Map;
 
-public final class EmailHomeIdpDiscovererFactory implements HomeIdpDiscovererFactory, ServerInfoAwareProviderFactory {
+public final class OrgsEmailHomeIdpDiscovererFactory implements HomeIdpDiscovererFactory, ServerInfoAwareProviderFactory {
 
-    static final String PROVIDER_ID = "email";
+    static final String PROVIDER_ID = "orgs-email";
 
     @Override
     public HomeIdpDiscoverer create(KeycloakSession keycloakSession) {
-        return new EmailHomeIdpDiscoverer(new Users(keycloakSession), new DefaultIdentityProviders());
+        return new EmailHomeIdpDiscoverer(new Users(keycloakSession), new OrgsIdentityProviders());
     }
 
     @Override
@@ -41,7 +42,7 @@ public final class EmailHomeIdpDiscovererFactory implements HomeIdpDiscovererFac
     }
 
     @Override
-    public Map<String, String> getOperationalInfo() {
+    public final Map<String, String> getOperationalInfo() {
         return OperationalInfo.get();
     }
 }
