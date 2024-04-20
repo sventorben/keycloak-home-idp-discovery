@@ -5,6 +5,7 @@ import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +51,7 @@ public interface IdentityProviders {
      *                current authentication process.
      * @return A list of {@link IdentityProviderModel} from the realm. May be empty but not {@code null}.
      */
-    default List<IdentityProviderModel> candidatesForHomeIdp(AuthenticationFlowContext context) {
+    default List<IdentityProviderModel> candidatesForHomeIdp(AuthenticationFlowContext context, UserModel user) {
         RealmModel realm = context.getRealm();
         List<IdentityProviderModel> enabledIdps = realm.getIdentityProvidersStream()
             .filter(IdentityProviderModel::isEnabled)
