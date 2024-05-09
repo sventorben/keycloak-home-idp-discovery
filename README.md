@@ -9,6 +9,7 @@ This is a simple Keycloak authenticator to redirect users to their home identity
 
 ![CI build](https://github.com/sventorben/keycloak-home-idp-discovery/actions/workflows/buildAndTest.yml/badge.svg)
 ![open issues](https://img.shields.io/github/issues/sventorben/keycloak-home-idp-discovery)
+[![CodeScene Code Health](https://codescene.io/projects/53524/status-badges/code-health)](https://codescene.io/projects/53524)
 
 ## What is it good for?
 
