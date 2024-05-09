@@ -18,6 +18,7 @@ import static java.util.Collections.emptyList;
 public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
 
     private static final Logger LOG = Logger.getLogger(EmailHomeIdpDiscoverer.class);
+    private static final String EMAIL_ATTRIBUTE = "email";
     private final Users users;
     private final IdentityProviders identityProviders;
 
@@ -29,7 +30,6 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
 
     @Override
     public List<IdentityProviderModel> discoverForUser(AuthenticationFlowContext context, String username) {
-
         EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
         DomainExtractor domainExtractor = new DomainExtractor(config);
 
@@ -48,7 +48,13 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
         } else {
             LOG.tracef("User found in AuthenticationFlowContext. Extracting domain from stored user '%s'.",
                 user.getId());
-            emailDomain = domainExtractor.extractFrom(user);
+            if (EMAIL_ATTRIBUTE.equalsIgnoreCase(config.userAttribute()) && !user.isEmailVerified()
+                && !config.forwardUserWithUnverifiedEmail()) {
+                LOG.warnf("Email address of user '%s' is not verified and forwarding not enabled", user.getId());
+                emailDomain = Optional.empty();
+            } else {
+                emailDomain = domainExtractor.extractFrom(user);
+            }
         }
 
         if (emailDomain.isPresent()) {

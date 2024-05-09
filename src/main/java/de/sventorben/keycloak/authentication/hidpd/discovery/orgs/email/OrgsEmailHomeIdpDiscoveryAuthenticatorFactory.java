@@ -1,15 +1,12 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.orgs.email;
 
 import de.sventorben.keycloak.authentication.hidpd.AbstractHomeIdpDiscoveryAuthenticatorFactory;
-import de.sventorben.keycloak.authentication.hidpd.OperationalInfo;
 import org.keycloak.Config;
 import org.keycloak.common.Profile;
 import org.keycloak.provider.EnvironmentDependentProviderFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public final class OrgsEmailHomeIdpDiscoveryAuthenticatorFactory extends AbstractHomeIdpDiscoveryAuthenticatorFactory implements EnvironmentDependentProviderFactory {
 
@@ -24,7 +21,7 @@ public final class OrgsEmailHomeIdpDiscoveryAuthenticatorFactory extends Abstrac
         super(new DiscovererConfig() {
             @Override
             public List<ProviderConfigProperty> getProperties() {
-                return Collections.emptyList();
+                return OrgsEmailHomeIdpDiscovererConfig.CONFIG_PROPERTIES;
             }
 
             @Override

@@ -26,7 +26,7 @@ public final class OrgsDomainHomeIdpDiscoveryAuthenticatorFactory extends Abstra
 
             @Override
             public String getProviderId() {
-                return PROVIDER_ID;
+                return OrgsDomainDiscovererProviderFactory.PROVIDER_ID;
             }
         });
     }
