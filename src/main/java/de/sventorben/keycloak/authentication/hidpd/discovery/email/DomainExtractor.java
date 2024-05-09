@@ -8,7 +8,6 @@ import java.util.Optional;
 final class DomainExtractor {
 
     private static final Logger LOG = Logger.getLogger(DomainExtractor.class);
-    private static final String EMAIL_ATTRIBUTE = "email";
 
     private final EmailHomeIdpDiscovererConfig config;
 
@@ -24,11 +23,6 @@ final class DomainExtractor {
         String userAttribute = user.getFirstAttribute(config.userAttribute());
         if (userAttribute == null) {
             LOG.warnf("Could not find user attribute '%s' for user '%s'", config.userAttribute(), user.getId());
-            return Optional.empty();
-        }
-        if (EMAIL_ATTRIBUTE.equalsIgnoreCase(config.userAttribute()) && !user.isEmailVerified()
-            && !config.forwardUserWithUnverifiedEmail()) {
-            LOG.warnf("Email address of user '%s' is not verified and forwarding not enabled", user.getId());
             return Optional.empty();
         }
         return extractFrom(userAttribute);

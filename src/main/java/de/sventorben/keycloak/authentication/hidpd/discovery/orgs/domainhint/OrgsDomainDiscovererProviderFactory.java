@@ -14,7 +14,7 @@ import java.util.Map;
 
 public final class OrgsDomainDiscovererProviderFactory implements HomeIdpDiscovererFactory, EnvironmentDependentProviderFactory, ServerInfoAwareProviderFactory {
 
-    private static final String PROVIDER_ID = "orgs-domain";
+    static final String PROVIDER_ID = "orgs-domain";
 
     @Override
     public boolean isSupported(Config.Scope config) {
