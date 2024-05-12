@@ -3,12 +3,13 @@
 This is a simple Keycloak authenticator to redirect users to their home identity provider during login.
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sventorben/keycloak-home-idp-discovery?sort=semver)
-![Keycloak Dependency Version](https://img.shields.io/badge/Keycloak-24.0.3-blue)
+![Keycloak Dependency Version](https://img.shields.io/badge/Keycloak-24.0.4-blue)
 ![GitHub Release Date](https://img.shields.io/github/release-date-pre/sventorben/keycloak-home-idp-discovery)
 ![Github Last Commit](https://img.shields.io/github/last-commit/sventorben/keycloak-home-idp-discovery)
 
 ![CI build](https://github.com/sventorben/keycloak-home-idp-discovery/actions/workflows/buildAndTest.yml/badge.svg)
 ![open issues](https://img.shields.io/github/issues/sventorben/keycloak-home-idp-discovery)
+[![CodeScene Code Health](https://codescene.io/projects/53524/status-badges/code-health)](https://codescene.io/projects/53524)
 
 ## What is it good for?
 

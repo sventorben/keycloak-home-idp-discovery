@@ -30,7 +30,7 @@ distro, I will no longer put any efforts into keeping this extension compatible.
 If you are using Keycloak version `X` (e.g. `X.y.z`), version `X.b.c` of this extension should be compatible.
 Keycloak SPIs are quite stable. So, there is a high chance this authenticator will work with other versions, too. Check
 the details of
-latest [build results](https://github.com/sventorben/keycloak-home-idp-discovery/actions/workflows/buildAndTest.yml) for
+latest [compatibility test run](https://github.com/sventorben/keycloak-home-idp-discovery/actions/workflows/matrix.yml) for
 an overview or simply give it a try.
 
 Authenticator version `X.b.c` is compiled against Keycloak version `X.y.z`. For example, version `16.3.1` will be
