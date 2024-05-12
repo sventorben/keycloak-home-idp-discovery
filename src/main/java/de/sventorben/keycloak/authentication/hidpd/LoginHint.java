@@ -29,7 +29,7 @@ final class LoginHint {
         if (homeIdp == null) {
             return;
         }
-        String loginHint;
+        String loginHint = username;
         UserModel user = users.lookupBy(username);
         if (user != null) {
             Map<String, String> idpToUsername = context.getSession().users()
@@ -38,8 +38,8 @@ final class LoginHint {
                     Collectors.toMap(FederatedIdentityModel::getIdentityProvider,
                         FederatedIdentityModel::getUserName));
             loginHint = idpToUsername.getOrDefault(homeIdp.getAlias(), username);
-            setInAuthSession(loginHint);
         }
+        setInAuthSession(loginHint);
     }
 
     void setInAuthSession(String loginHint) {

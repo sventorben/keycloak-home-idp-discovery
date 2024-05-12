@@ -363,7 +363,7 @@ class HomeIdpDiscoveryIT {
     }
 
     @Nested
-    @DisplayName("GH-251: Given non-existing user")
+    @DisplayName("GH-251: Given non-existing user without matching domain")
     class GivenNonExistingUser {
 
         private String username = "does not exist";
@@ -402,6 +402,32 @@ class HomeIdpDiscoveryIT {
         @DisplayName("then ask for password")
         public void willAskForPassword() {
             testRealmLoginPage().assertPasswordFieldIsDisplayed();
+        }
+
+    }
+
+    @Nested
+    @DisplayName("GH-363: Given non-existing user with matching domain")
+    class GivenNonExistingUserWithMatchingDomain {
+
+        private String username = "someone@example.com";
+
+        @BeforeEach
+        public void setUp() {
+            accountConsolePage().open();
+            testRealmLoginPage().signIn(username);
+        }
+
+        @Test
+        @DisplayName("then redirect")
+        public void willRedirectToIdp() {
+            assertRedirectedToIdp();
+        }
+
+        @Test
+        @DisplayName("then pass login_hint parameter to downstream IdP")
+        public void willForwardLoginHint() {
+            assertThat(webDriver.getCurrentUrl()).contains("&login_hint=someone%40example.com&");
         }
     }
 
