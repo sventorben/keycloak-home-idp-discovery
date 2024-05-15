@@ -9,6 +9,7 @@ import org.keycloak.organization.OrganizationProvider;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class OrgsDomainDiscoverer implements HomeIdpDiscoverer {
 
@@ -29,10 +30,9 @@ final class OrgsDomainDiscoverer implements HomeIdpDiscoverer {
 
         OrganizationModel org = orgProvider.getByDomainName(domain);
         if (org != null) {
-            IdentityProviderModel idp = org.getIdentityProvider();
-            if (idp != null) {
-                return Collections.singletonList(idp);
-            }
+            return org.getIdentityProviders()
+                .filter(IdentityProviderModel::isEnabled)
+                .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }

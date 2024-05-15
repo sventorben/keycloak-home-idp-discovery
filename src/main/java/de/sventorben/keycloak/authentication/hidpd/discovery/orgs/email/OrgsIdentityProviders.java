@@ -4,6 +4,7 @@ import de.sventorben.keycloak.authentication.hidpd.discovery.email.Domain;
 import de.sventorben.keycloak.authentication.hidpd.discovery.email.IdentityProviders;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.IdentityProviderModel;
+import org.keycloak.models.OrganizationDomainModel;
 import org.keycloak.models.OrganizationModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.organization.OrganizationProvider;
@@ -11,6 +12,7 @@ import org.keycloak.organization.OrganizationProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class OrgsIdentityProviders implements IdentityProviders {
 
@@ -22,11 +24,10 @@ final class OrgsIdentityProviders implements IdentityProviders {
         }
         if (orgProvider.isEnabled()) {
             OrganizationModel org = orgProvider.getByMember(user);
-            if (org != null) {
-                IdentityProviderModel orgIdp = org.getIdentityProvider();
-                if (orgIdp != null) {
-                    return Collections.singletonList(orgIdp);
-                }
+            if (org != null && org.isEnabled()) {
+                return org.getIdentityProviders()
+                    .filter(IdentityProviderModel::isEnabled)
+                    .collect(Collectors.toList());
             }
         } else {
             // TODO: Log a warning
@@ -39,18 +40,21 @@ final class OrgsIdentityProviders implements IdentityProviders {
         OrganizationProvider orgProvider = context.getSession().getProvider(OrganizationProvider.class);
         if (orgProvider.isEnabled()) {
             OrganizationModel org = orgProvider.getByDomainName(domain.getRawValue());
-            if (org != null) {
-                IdentityProviderModel orgIdp = org.getIdentityProvider();
-                if (orgIdp != null) {
-                    List<IdentityProviderModel> result = new ArrayList<>(candidates);
-                    result.add(orgIdp);
-                    return result;
+            if (org != null && org.isEnabled()) {
+                boolean verified = org.getDomains()
+                    .filter(it -> domain.getRawValue().equalsIgnoreCase(it.getName()))
+                    .anyMatch(OrganizationDomainModel::getVerified);
+                if (verified) {
+                    return org.getIdentityProviders()
+                        .filter(IdentityProviderModel::isEnabled)
+                        // TODO: Filter based on domain - should only be one
+                        .collect(Collectors.toList());
                 }
             }
         } else {
             // TODO: Log a warning
         }
-        return candidates;
+        return Collections.emptyList();
     }
 
 }
