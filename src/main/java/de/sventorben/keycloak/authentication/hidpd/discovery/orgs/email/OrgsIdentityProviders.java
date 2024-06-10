@@ -43,7 +43,7 @@ final class OrgsIdentityProviders implements IdentityProviders {
             if (org != null && org.isEnabled()) {
                 boolean verified = org.getDomains()
                     .filter(it -> domain.getRawValue().equalsIgnoreCase(it.getName()))
-                    .anyMatch(OrganizationDomainModel::getVerified);
+                    .anyMatch(OrganizationDomainModel::isVerified);
                 if (verified) {
                     return org.getIdentityProviders()
                         .filter(IdentityProviderModel::isEnabled)
