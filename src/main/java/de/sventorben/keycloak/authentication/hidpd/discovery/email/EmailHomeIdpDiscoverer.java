@@ -61,8 +61,20 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
             Domain domain = emailDomain.get();
             homeIdps = discoverHomeIdps(context, domain, user, username);
             if (homeIdps.isEmpty()) {
-                LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'",
+                // In case no idp found in light of the email domain
+                List<IdentityProviderModel> candidateIdps = identityProviders.candidatesForHomeIdp(context, user);
+                if (candidateIdps == null) {
+                    candidateIdps = emptyList();
+                } else {
+                    // get default idp defined in configuration
+                    homeIdps = candidateIdps.stream()
+                    .filter(it -> config.defaultIdentityProvider().equals(it.getAlias()) )
+                    .collect(Collectors.toList());
+                }
+                if(homeIdps.isEmpty()) {
+                    LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'",
                     domain, username, realmName);
+                }
             }
         } else {
             LOG.warnf("Could not extract domain from email address '%s'", username);

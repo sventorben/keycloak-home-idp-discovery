@@ -15,6 +15,7 @@ final class EmailHomeIdpDiscovererConfig {
     private static final String FORWARD_TO_LINKED_IDP = "forwardToLinkedIdp";
     private static final String USER_ATTRIBUTE = "userAttribute";
     private static final String FORWARD_UNVERIFIED_ATTRIBUTE = "forwardUnverifiedEmail";
+    private static final String DEFAULT_IDP_PROVIDER_ATTRIBUTE = "defaultIdentityProvider";
 
     private static final ProviderConfigProperty FORWARD_TO_LINKED_IDP_PROPERTY = new ProviderConfigProperty(
         FORWARD_TO_LINKED_IDP,
@@ -40,11 +41,22 @@ final class EmailHomeIdpDiscovererConfig {
         false,
         false);
 
+    private static final ProviderConfigProperty DEFAULT_IDP_PROVIDER_PROPERTY = new ProviderConfigProperty(
+        DEFAULT_IDP_PROVIDER_ATTRIBUTE,
+        "Default Identity Provider",
+        "To automatically redirect to an identity provider set to the alias of the identity provider, if email domain doesn't match any idp configuration.",
+        STRING_TYPE,
+        "",
+        false);
+
+
     static final List<ProviderConfigProperty> CONFIG_PROPERTIES = ProviderConfigurationBuilder.create()
         .property(USER_ATTRIBUTE_PROPERTY)
         .property(FORWARD_UNVERIFIED_PROPERTY)
         .property(FORWARD_TO_LINKED_IDP_PROPERTY)
+        .property(DEFAULT_IDP_PROVIDER_PROPERTY)
         .build();
+
     private final AuthenticatorConfigModel authenticatorConfigModel;
 
     public EmailHomeIdpDiscovererConfig(AuthenticatorConfigModel authenticatorConfigModel) {
@@ -67,6 +79,12 @@ final class EmailHomeIdpDiscovererConfig {
         return Optional.ofNullable(authenticatorConfigModel)
             .map(it -> Boolean.parseBoolean(it.getConfig().getOrDefault(FORWARD_UNVERIFIED_ATTRIBUTE, "false")))
             .orElse(false);
+    }
+
+    String defaultIdentityProvider() {
+        return Optional.ofNullable(authenticatorConfigModel)
+            .map(it -> it.getConfig().getOrDefault(DEFAULT_IDP_PROVIDER_ATTRIBUTE, "").trim())
+            .orElse("");
     }
 
     String getAlias() {
