@@ -93,6 +93,7 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
         final List<IdentityProviderModel> homeIdps = context.discoverer(discovererConfig).discoverForUser(authenticationFlowContext, username);
         if (homeIdps.isEmpty()) {
             authenticationFlowContext.attempted();
+            context.loginHint().setInAuthSession(username);
         } else {
             RememberMe rememberMe = context.rememberMe();
             rememberMe.handleAction(formData);
