@@ -30,6 +30,10 @@ See the image below for an example:
 
 ![Example flow](images/flow.JPG)
 
+![User and Password SubFlow](images/username-password-subflow.png)
+
+![User and Password Form](images/username-password-form.png)
+
 ## General configuration options
 
 To configure click settings/gear icon (&#9881;)
