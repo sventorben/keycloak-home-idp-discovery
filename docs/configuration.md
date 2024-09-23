@@ -30,7 +30,11 @@ See the image below for an example:
 
 ![Example flow](images/flow.JPG)
 
+* In the image above, `username and password` is a sub-flow added by clicking `Add sub-flow`
+
 ![User and Password SubFlow](images/username-password-subflow.png)
+
+* Under this sub-flow, the step `Username Password Form` is added
 
 ![User and Password Form](images/username-password-form.png)
 
