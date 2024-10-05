@@ -31,6 +31,7 @@ class AlternativeMessagesIT {
     @Container
     private static final BrowserWebDriverContainer BROWSER = new BrowserWebDriverContainer<>()
         .withCapabilities(new ChromeOptions().addArguments("--no-sandbox", "--disable-dev-shm-usage"))
+        .withEnv("SE_ENABLE_TRACING", "false")
         .dependsOn(KEYCLOAK_CONTAINER)
         .withRecordingMode(
             VncRecordingMode.RECORD_ALL,
