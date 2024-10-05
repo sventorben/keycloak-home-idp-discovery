@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 final class OrgsIdentityProviders implements IdentityProviders {
 
@@ -23,9 +24,11 @@ final class OrgsIdentityProviders implements IdentityProviders {
             return Collections.emptyList();
         }
         if (orgProvider.isEnabled()) {
-            OrganizationModel org = orgProvider.getByMember(user);
-            if (org != null && org.isEnabled()) {
-                return org.getIdentityProviders()
+            Stream<OrganizationModel> orgs = orgProvider.getByMember(user);
+            if (orgs != null) {
+                return orgs
+                    .filter(OrganizationModel::isEnabled)
+                    .flatMap(OrganizationModel::getIdentityProviders)
                     .filter(IdentityProviderModel::isEnabled)
                     .collect(Collectors.toList());
             }
