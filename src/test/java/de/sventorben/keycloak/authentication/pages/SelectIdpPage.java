@@ -13,7 +13,7 @@ public class SelectIdpPage {
     private final WebDriver webDriver;
     private final String keycloakBaseUrl;
 
-    @FindBy(css = "h4")
+    @FindBy(css = "h2")
     private WebElement pageTitle;
 
     public SelectIdpPage(WebDriver webDriver, String keycloakBaseUrl) {
