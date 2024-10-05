@@ -68,7 +68,7 @@ class HomeIdpDiscoveryIT {
     }
 
     @Test
-    @DisplayName("Given user's email is has a primary managed domain, redirect")
+    @DisplayName("Given user's email has a primary managed domain, redirect")
     public void redirectIfUserHasDomain() {
         accountConsolePage().open();
         testRealmLoginPage().signIn("test@example.com");
@@ -76,7 +76,7 @@ class HomeIdpDiscoveryIT {
     }
 
     @Test
-    @DisplayName("Given user's email is has an alternate managed domain, redirect")
+    @DisplayName("Given user's email has an alternate managed domain, redirect")
     public void redirectIfUserHasAlternateDomain() {
         accountConsolePage().open();
         testRealmLoginPage().signIn("test2@example.net");
