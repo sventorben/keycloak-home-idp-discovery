@@ -9,6 +9,7 @@ import org.keycloak.models.IdentityProviderModel;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 final class LoginForm {
@@ -44,10 +45,21 @@ final class LoginForm {
     Response create(List<IdentityProviderModel> idps) {
         URI baseUriWithCodeAndClientId = loginFormsProvider.getBaseUriWithCodeAndClientId();
         LoginFormsProvider forms = context.form();
-        forms.setAttribute("hidpd", new IdentityProviderBean(context.getRealm(),
+        forms.setAttribute("hidpd", new IdentityProviderBean(
             context.getSession(),
-            idps.stream().map(AlwaysSelectableIdentityProviderModel::new).collect(Collectors.toList()),
-            baseUriWithCodeAndClientId));
+            context.getRealm(),
+            baseUriWithCodeAndClientId,
+            context
+            ) {
+                @Override
+                public List<IdentityProvider> getProviders() {
+                    return idps.stream()
+                        .map(AlwaysSelectableIdentityProviderModel::new)
+                        .map(idp -> createIdentityProvider(this.realm, this.baseURI, idp))
+                        .toList();
+                }
+            }
+        );
         return forms.createForm("hidpd-select-idp.ftl");
     }
 }
