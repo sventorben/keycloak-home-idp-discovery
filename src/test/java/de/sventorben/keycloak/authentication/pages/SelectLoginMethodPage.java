@@ -19,8 +19,8 @@ public class SelectLoginMethodPage {
     @FindBy(css = "h1[id='kc-page-title']")
     private WebElement pageTitle;
 
-    @FindBy(css = "form[id='kc-select-credential-form']")
-    private WebElement selectCredentialForm;
+    @FindBy(css = "ul.select-auth-container")
+    private WebElement selectAuthContainer;
 
     public SelectLoginMethodPage(WebDriver webDriver, String keycloakBaseUrl) {
         this.webDriver = webDriver;
@@ -32,17 +32,17 @@ public class SelectLoginMethodPage {
     }
 
     public void assertThatHasAlternativeWithTitle(String title) {
-        assertThat(selectCredentialForm.isDisplayed()).isTrue();
+        assertThat(selectAuthContainer.isDisplayed()).isTrue();
         assertThat(getTexts("select-auth-box-headline")).contains(title);
     }
 
     public void assertThatHasAlternativeWithHelpText(String helpText) {
-        assertThat(selectCredentialForm.isDisplayed()).isTrue();
+        assertThat(selectAuthContainer.isDisplayed()).isTrue();
         assertThat(getTexts("select-auth-box-desc")).contains(helpText);
     }
 
     private List<String> getTexts(String className) {
-        return selectCredentialForm.findElements(By.className(className))
+        return selectAuthContainer.findElements(By.className(className))
             .stream().map(it -> it.getText().trim()).collect(Collectors.toList());
     }
 
