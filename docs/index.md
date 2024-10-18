@@ -9,7 +9,7 @@ nav_order: 1
 This is a simple Keycloak authenticator to redirect users to their home identity provider during login.
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/sventorben/keycloak-home-idp-discovery?sort=semver)
-![Keycloak Dependency Version](https://img.shields.io/badge/Keycloak-26.0.0-blue)
+![Keycloak Dependency Version](https://img.shields.io/badge/Keycloak-26.0.1-blue)
 ![GitHub Release Date](https://img.shields.io/github/release-date-pre/sventorben/keycloak-home-idp-discovery)
 ![Github Last Commit](https://img.shields.io/github/last-commit/sventorben/keycloak-home-idp-discovery)
 
