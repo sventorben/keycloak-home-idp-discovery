@@ -1,23 +1,29 @@
-package de.sventorben.keycloak.authentication.hidpd.discovery.email;
+package de.sventorben.keycloak.authentication.hidpd.discovery.orgs.domainhint;
 
 import de.sventorben.keycloak.authentication.hidpd.OperationalInfo;
-import de.sventorben.keycloak.authentication.hidpd.Users;
 import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscoverer;
 import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscovererFactory;
 import org.keycloak.Config;
+import org.keycloak.common.Profile;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.provider.EnvironmentDependentProviderFactory;
 import org.keycloak.provider.ServerInfoAwareProviderFactory;
 
 import java.util.Map;
 
-public final class EmailHomeIdpDiscovererFactory implements HomeIdpDiscovererFactory, ServerInfoAwareProviderFactory {
+public final class OrgsDomainDiscovererProviderFactory implements HomeIdpDiscovererFactory, EnvironmentDependentProviderFactory, ServerInfoAwareProviderFactory {
 
-    static final String PROVIDER_ID = "email";
+    static final String PROVIDER_ID = "orgs-domain";
+
+    @Override
+    public boolean isSupported(Config.Scope config) {
+        return Profile.isFeatureEnabled(Profile.Feature.ORGANIZATION);
+    }
 
     @Override
     public HomeIdpDiscoverer create(KeycloakSession keycloakSession) {
-        return new EmailHomeIdpDiscoverer(new Users(keycloakSession), new DefaultIdentityProviders());
+        return new OrgsDomainDiscoverer(keycloakSession);
     }
 
     @Override
@@ -41,7 +47,8 @@ public final class EmailHomeIdpDiscovererFactory implements HomeIdpDiscovererFac
     }
 
     @Override
-    public Map<String, String> getOperationalInfo() {
+    public final Map<String, String> getOperationalInfo() {
         return OperationalInfo.get();
     }
+
 }

@@ -1,1 +1,3 @@
 de.sventorben.keycloak.authentication.hidpd.discovery.email.EmailHomeIdpDiscovererFactory
+de.sventorben.keycloak.authentication.hidpd.discovery.orgs.domainhint.OrgsDomainDiscovererProviderFactory
+de.sventorben.keycloak.authentication.hidpd.discovery.orgs.email.OrgsEmailHomeIdpDiscovererFactory

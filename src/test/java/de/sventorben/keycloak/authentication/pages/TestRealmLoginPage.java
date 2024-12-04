@@ -23,7 +23,7 @@ public class TestRealmLoginPage {
     @FindBy(css = "input[id='username']")
     private WebElement usernameInput;
 
-    @FindBy(css = "input[id='kc-login']")
+    @FindBy(css = "button[id='kc-login']")
     private WebElement signInButton;
 
     @FindBy(css = "a[id='try-another-way']")

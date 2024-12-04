@@ -26,9 +26,6 @@ final class LoginHint {
     }
 
     void setInAuthSession(IdentityProviderModel homeIdp, String username) {
-        if (homeIdp == null) {
-            return;
-        }
         String loginHint = username;
         UserModel user = users.lookupBy(username);
         if (user != null) {
@@ -37,7 +34,8 @@ final class LoginHint {
                 .collect(
                     Collectors.toMap(FederatedIdentityModel::getIdentityProvider,
                         FederatedIdentityModel::getUserName));
-            loginHint = idpToUsername.getOrDefault(homeIdp.getAlias(), username);
+            String alias = homeIdp == null ? "" : homeIdp.getAlias();
+            loginHint = idpToUsername.getOrDefault(alias, username);
         }
         setInAuthSession(loginHint);
     }

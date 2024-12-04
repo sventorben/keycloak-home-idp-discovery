@@ -17,6 +17,7 @@ class KeycloakDockerContainer {
     private static final String KEYCLOAK_ADMIN_PASS = "admin";
     private static final String KEYCLOAK_ADMIN_USER = "admin";
     private static final int KEYCLOAK_HTTP_PORT = 8080;
+    private static final int KEYCLOAK_METRICS_HTTP_PORT = 9000;
 
     static KeycloakContainer create(Network network) {
         String fullImage = FullImageName.get();
@@ -31,7 +32,7 @@ class KeycloakDockerContainer {
             .withRealmImportFile("/test-realm.json")
             .withRealmImportFile("/idp-realm.json")
             .withProviderClassesFrom("target/classes")
-            .withExposedPorts(KEYCLOAK_HTTP_PORT)
+            .withExposedPorts(KEYCLOAK_HTTP_PORT, KEYCLOAK_METRICS_HTTP_PORT)
             .withLogConsumer(new Slf4jLogConsumer(LOGGER).withSeparateOutputStreams())
             .withStartupTimeout(Duration.ofSeconds(90))
             .withNetwork(network)
