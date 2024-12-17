@@ -432,6 +432,29 @@ class HomeIdpDiscoveryIT {
     }
 
     @Nested
+    @DisplayName("GH-475: Given no session and prompt=login")
+    class GivenNoSessionAndPromptLogin {
+
+        @BeforeEach
+        public void setUp() {
+            upstreamIdpMock().redirectToDownstreamWithPromptLogin("test");
+        }
+
+        @Test
+        @DisplayName("then show username form field")
+        public void thenShowUsernameFormField() {
+            testRealmLoginPage().assertUsernameFieldIsDisplayed();
+        }
+
+        @Test
+        @DisplayName("then username form field is empty")
+        public void thenUsernameFormFieldIsEmpty() {
+            testRealmLoginPage().assertUsernameFieldIsPrefilledWith("");
+        }
+
+    }
+
+    @Nested
     @DisplayName("Given user is linked to an IdP already")
     class GivenUserHasIdpLinkConfigured {
 
