@@ -32,11 +32,13 @@ final class AuthenticationChallenge {
 
         String rememberMeUsername = rememberMe.getUserName();
 
+        Response challengeResponse;
         if (reauthentication.required() && context.getUser() != null) {
             String attribute = Optional.ofNullable(context.getAuthenticatorConfig())
                 .map(it -> it.getConfig().getOrDefault("userAttribute", "email").trim())
                 .orElse("email");
             formData.add(AuthenticationManager.FORM_USERNAME, context.getUser().getFirstAttribute(attribute));
+            challengeResponse = loginForm.createWithSignInButtonOnly(formData);
         } else {
             if (loginHintUsername != null || rememberMeUsername != null) {
                 if (loginHintUsername != null) {
@@ -46,12 +48,6 @@ final class AuthenticationChallenge {
                     formData.add("rememberMe", "on");
                 }
             }
-        }
-
-        Response challengeResponse;
-        if (reauthentication.required()) {
-            challengeResponse = loginForm.createWithSignInButtonOnly(formData);
-        } else {
             challengeResponse = loginForm.create(formData);
         }
 
