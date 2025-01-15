@@ -4,7 +4,7 @@
 
     <groupId>de.sventorben.keycloak</groupId>
     <artifactId>keycloak-home-idp-discovery</artifactId>
-    <version>26.0.2-SNAPSHOT</version>
+    <version>26.1.0</version>
 
     <name>Keycloak: Home IdP Discovery</name>
     <description>A Keycloak authenticator to redirect users to their home IdP</description>
@@ -28,7 +28,7 @@
         <developerConnection>scm:git:https://github.com/sventorben/keycloak-home-idp-discovery.git
         </developerConnection>
         <url>https://github.com/sventorben/keycloak-home-idp-discovery.git</url>
-        <tag>HEAD</tag>
+        <tag>v26.1.0</tag>
     </scm>
 
     <issueManagement>
