@@ -6,7 +6,6 @@ import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationProcessor;
 import org.keycloak.broker.provider.AuthenticationRequest;
 import org.keycloak.broker.provider.IdentityProvider;
-import org.keycloak.broker.provider.IdentityProviderFactory;
 import org.keycloak.broker.provider.util.IdentityBrokerState;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.KeycloakSession;
@@ -16,7 +15,7 @@ import org.keycloak.services.Urls;
 import org.keycloak.services.managers.ClientSessionCode;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
-import static org.keycloak.services.resources.IdentityBrokerService.getIdentityProviderFactory;
+import static org.keycloak.services.resources.IdentityBrokerService.getIdentityProvider;
 
 final class Redirector {
 
@@ -45,8 +44,7 @@ final class Redirector {
             return;
         }
         new HomeIdpAuthenticationFlowContext(context).loginHint().copyTo(clientSessionCode);
-        IdentityProviderFactory<?> providerFactory = getIdentityProviderFactory(keycloakSession, idp);
-        IdentityProvider<?> identityProvider = providerFactory.create(keycloakSession, idp);
+        IdentityProvider<?> identityProvider = getIdentityProvider(keycloakSession, idp.getAlias());
 
         Response response = identityProvider.performLogin(createAuthenticationRequest(providerAlias, identityProvider, clientSessionCode));
         context.forceChallenge(response);

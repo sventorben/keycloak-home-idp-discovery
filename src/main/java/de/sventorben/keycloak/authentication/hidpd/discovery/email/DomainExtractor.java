@@ -16,10 +16,6 @@ final class DomainExtractor {
     }
 
     Optional<Domain> extractFrom(UserModel user) {
-        if (!user.isEnabled()) {
-            LOG.warnf("User '%s' not enabled", user.getId());
-            return Optional.empty();
-        }
         String userAttribute = user.getFirstAttribute(config.userAttribute());
         if (userAttribute == null) {
             LOG.warnf("Could not find user attribute '%s' for user '%s'", config.userAttribute(), user.getId());

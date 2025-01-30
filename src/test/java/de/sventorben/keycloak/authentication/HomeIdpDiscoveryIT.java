@@ -126,7 +126,6 @@ class HomeIdpDiscoveryIT {
         assertRedirectedToIdp();
     }
 
-    /* Temporarily disabled as failure only seems to occur in automated tests, but not when testing manually
     @Nested
     @DisplayName("Remember Me")
     class RememberMe {
@@ -183,7 +182,6 @@ class HomeIdpDiscoveryIT {
                 .doesNotContain(COOKIE_NAME_REMEMBER_ME);
         }
     }
-    */
 
     @Nested
     @DisplayName("Given login page should be bypassed")
@@ -431,6 +429,29 @@ class HomeIdpDiscoveryIT {
         public void willForwardLoginHint() {
             assertThat(webDriver.getCurrentUrl()).contains("&login_hint=someone%40example.com&");
         }
+    }
+
+    @Nested
+    @DisplayName("GH-475: Given no session and prompt=login")
+    class GivenNoSessionAndPromptLogin {
+
+        @BeforeEach
+        public void setUp() {
+            upstreamIdpMock().redirectToDownstreamWithPromptLogin("test");
+        }
+
+        @Test
+        @DisplayName("then show username form field")
+        public void thenShowUsernameFormField() {
+            testRealmLoginPage().assertUsernameFieldIsDisplayed();
+        }
+
+        @Test
+        @DisplayName("then username form field is empty")
+        public void thenUsernameFormFieldIsEmpty() {
+            testRealmLoginPage().assertUsernameFieldIsPrefilledWith("");
+        }
+
     }
 
     @Nested
