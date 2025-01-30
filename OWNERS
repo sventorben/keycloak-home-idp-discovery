@@ -1,7 +1,5 @@
 reviewers:
 - theautoroboto
-- robotmaxtron
-- hbhushan3
 - katherinelc321
 - afreiberger
 - rhdedgar
@@ -11,10 +9,9 @@ reviewers:
 - rojasreinold
 - dustman9000
 - syncrou
+- SteveHNH
 approvers:
 - theautoroboto
-- robotmaxtron
-- hbhushan3
 - katherinelc321
 - afreiberger
 - rhdedgar
@@ -24,3 +21,4 @@ approvers:
 - rojasreinold
 - dustman9000
 - syncrou
+- SteveHNH
