@@ -18,7 +18,7 @@ public final class OrgsEmailHomeIdpDiscovererFactory implements HomeIdpDiscovere
 
     @Override
     public HomeIdpDiscoverer create(KeycloakSession keycloakSession) {
-        return new EmailHomeIdpDiscoverer(new Users(keycloakSession), new OrgsIdentityProviders());
+        return new EmailHomeIdpDiscoverer(new Users(keycloakSession), new OrgsIdentityProviders(keycloakSession));
     }
 
     @Override
