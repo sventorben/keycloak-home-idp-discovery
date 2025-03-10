@@ -1,8 +1,11 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.spi;
 
 import de.sventorben.keycloak.authentication.hidpd.PublicAPI;
+import de.sventorben.keycloak.authentication.hidpd.discovery.HomeIdpDiscovererConfig;
+import de.sventorben.keycloak.authentication.hidpd.discovery.email.EmailHomeIdpDiscovererConfig;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.IdentityProviderModel;
+import org.keycloak.models.RealmModel;
 import org.keycloak.provider.Provider;
 
 import java.util.List;
@@ -28,7 +31,7 @@ import java.util.List;
  * @see AuthenticationFlowContext
  */
 @PublicAPI(unstable = true)
-public interface HomeIdpDiscoverer extends Provider {
+public interface HomeIdpDiscoverer<DC extends HomeIdpDiscovererConfig> extends Provider {
 
     /**
      * Discovers and returns a list of {@link IdentityProviderModel} instances representing
@@ -58,5 +61,14 @@ public interface HomeIdpDiscoverer extends Provider {
      *         home IdP(s) for the user. The list may be empty if no home IdP is associated
      *         with the user. Do not return {@code null}.
      */
-    List<IdentityProviderModel> discoverForUser(AuthenticationFlowContext context, String username);
+    default List<IdentityProviderModel> discoverForUser(AuthenticationFlowContext context, String username) {
+        DC discovererConfig = getConfigFrom(context);
+        RealmModel realm = context.getRealm();
+        return discoverForUser(discovererConfig, realm, username);
+    }
+
+    List<IdentityProviderModel> discoverForUser(DC discovererConfig, RealmModel realm, String username);
+
+    DC getConfigFrom(AuthenticationFlowContext context);
+
 }
