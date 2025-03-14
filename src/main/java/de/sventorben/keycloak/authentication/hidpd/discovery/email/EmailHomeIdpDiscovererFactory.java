@@ -2,6 +2,7 @@ package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
 import de.sventorben.keycloak.authentication.hidpd.OperationalInfo;
 import de.sventorben.keycloak.authentication.hidpd.Users;
+import de.sventorben.keycloak.authentication.hidpd.discovery.HomeIdpDiscovererConfig;
 import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscoverer;
 import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscovererFactory;
 import org.keycloak.Config;
@@ -16,7 +17,7 @@ public final class EmailHomeIdpDiscovererFactory implements HomeIdpDiscovererFac
     static final String PROVIDER_ID = "email";
 
     @Override
-    public HomeIdpDiscoverer create(KeycloakSession keycloakSession) {
+    public HomeIdpDiscoverer<? extends HomeIdpDiscovererConfig> create(KeycloakSession keycloakSession) {
         return new EmailHomeIdpDiscoverer(new Users(keycloakSession), new DefaultIdentityProviders());
     }
 
