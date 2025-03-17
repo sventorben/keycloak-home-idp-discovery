@@ -56,7 +56,7 @@
         <!-- For compatibility tests -->
         <keycloak.version>${version.keycloak}</keycloak.version>
 
-        <version.mockito>5.15.2</version.mockito>
+        <version.mockito>5.16.1</version.mockito>
         <version.testcontainers>1.20.6</version.testcontainers>
         <version.selenium>4.28.1</version.selenium>
     </properties>
