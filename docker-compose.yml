@@ -10,7 +10,7 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       DEBUG_PORT: '*:8787'
       DEBUG: 'true'
-    command: ['start-dev', '--debug', '--import-realm', '--features=organization']
+    command: ['start-dev', '--debug', '--import-realm', '--features=organization,declarative-ui']
     ports:
       - 8080:8080
       - 8443:8443
