@@ -51,14 +51,15 @@
         <maven.compiler.release>17</maven.compiler.release>
 
         <!-- For compilation -->
-        <version.keycloak>26.1.3</version.keycloak>
+        <version.keycloak>26.2.0</version.keycloak>
 
         <!-- For compatibility tests -->
         <keycloak.version>${version.keycloak}</keycloak.version>
 
-        <version.mockito>5.15.2</version.mockito>
-        <version.testcontainers>1.20.5</version.testcontainers>
+        <version.mockito>5.16.1</version.mockito>
+        <version.testcontainers>1.20.6</version.testcontainers>
         <version.selenium>4.29.0</version.selenium>
+
     </properties>
 
     <build>
@@ -161,7 +162,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.12.0</version>
+                <version>5.12.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -169,7 +170,7 @@
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-bom</artifactId>
-                <version>1.47.0</version><!-- needs to be aligne with the quarkus version used by KC -->
+                <version>1.49.0</version><!-- needs to be aligne with the quarkus version used by KC -->
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -202,6 +203,12 @@
             <artifactId>keycloak-services</artifactId>
             <version>${version.keycloak}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.slf4j</groupId>
+                    <artifactId>slf4j-jboss-logmanager</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Test -->
