@@ -29,7 +29,7 @@ class KeycloakDockerContainer {
         LOGGER.info("Running test with image: " + container.getDockerImageName());
         return container
             .withImagePullPolicy(pullPolicy)
-            .withRealmImportFile("/test-realm.json")
+            .withRealmImportFile("/test-realm-realm.json")
             .withRealmImportFile("/idp-realm.json")
             .withProviderClassesFrom("target/classes")
             .withExposedPorts(KEYCLOAK_HTTP_PORT, KEYCLOAK_METRICS_HTTP_PORT)
