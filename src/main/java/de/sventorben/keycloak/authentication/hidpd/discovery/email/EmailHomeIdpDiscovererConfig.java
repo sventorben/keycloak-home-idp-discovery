@@ -1,5 +1,7 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
+import de.sventorben.keycloak.authentication.hidpd.PublicAPI;
+import de.sventorben.keycloak.authentication.hidpd.discovery.HomeIdpDiscovererConfig;
 import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
@@ -10,11 +12,12 @@ import java.util.Optional;
 import static org.keycloak.provider.ProviderConfigProperty.BOOLEAN_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
-final class EmailHomeIdpDiscovererConfig {
+@PublicAPI(unstable = true)
+public final class EmailHomeIdpDiscovererConfig implements HomeIdpDiscovererConfig {
 
     private static final String FORWARD_TO_LINKED_IDP = "forwardToLinkedIdp";
-    private static final String USER_ATTRIBUTE = "userAttribute";
-    private static final String FORWARD_UNVERIFIED_ATTRIBUTE = "forwardUnverifiedEmail";
+    public static final String USER_ATTRIBUTE = "userAttribute";
+    public static final String FORWARD_UNVERIFIED_ATTRIBUTE = "forwardUnverifiedEmail";
 
     private static final ProviderConfigProperty FORWARD_TO_LINKED_IDP_PROPERTY = new ProviderConfigProperty(
         FORWARD_TO_LINKED_IDP,
@@ -45,6 +48,7 @@ final class EmailHomeIdpDiscovererConfig {
         .property(FORWARD_UNVERIFIED_PROPERTY)
         .property(FORWARD_TO_LINKED_IDP_PROPERTY)
         .build();
+
     private final AuthenticatorConfigModel authenticatorConfigModel;
 
     public EmailHomeIdpDiscovererConfig(AuthenticatorConfigModel authenticatorConfigModel) {
@@ -57,7 +61,8 @@ final class EmailHomeIdpDiscovererConfig {
             .orElse(false);
     }
 
-    String userAttribute() {
+    @Override
+    public String userAttribute() {
         return Optional.ofNullable(authenticatorConfigModel)
             .map(it -> it.getConfig().getOrDefault(USER_ATTRIBUTE, "email").trim())
             .orElse("email");
