@@ -7,6 +7,7 @@ import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.FederatedIdentityModel;
 import org.keycloak.models.IdentityProviderModel;
+import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import java.util.*;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 
 @PublicAPI(unstable = true)
-public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
+public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer<EmailHomeIdpDiscovererConfig> {
 
     private static final Logger LOG = Logger.getLogger(EmailHomeIdpDiscoverer.class);
     private static final String EMAIL_ATTRIBUTE = "email";
@@ -29,11 +30,15 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
     }
 
     @Override
-    public List<IdentityProviderModel> discoverForUser(AuthenticationFlowContext context, String username) {
-        EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
+    public EmailHomeIdpDiscovererConfig getConfigFrom(AuthenticationFlowContext context) {
+        return new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
+    }
+
+    @Override
+    public List<IdentityProviderModel> discoverForUser(EmailHomeIdpDiscovererConfig config, RealmModel realm, String username) {
         DomainExtractor domainExtractor = new DomainExtractor(config);
 
-        String realmName = context.getRealm().getName();
+        String realmName = realm.getName();
         LOG.tracef("Trying to discover home IdP for username '%s' in realm '%s' with authenticator config '%s'",
             username, realmName, config.getAlias());
 
@@ -59,7 +64,7 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
 
         if (emailDomain.isPresent()) {
             Domain domain = emailDomain.get();
-            homeIdps = discoverHomeIdps(context, domain, user, username);
+            homeIdps = discoverHomeIdps(config, domain, realm, user, username);
             if (homeIdps.isEmpty()) {
                 LOG.infof("Could not find home IdP for domain '%s' and user '%s' in realm '%s'",
                     domain, username, realmName);
@@ -71,10 +76,9 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
         return homeIdps;
     }
 
-    private List<IdentityProviderModel> discoverHomeIdps(AuthenticationFlowContext context, Domain domain, UserModel user, String username) {
+    private List<IdentityProviderModel> discoverHomeIdps(EmailHomeIdpDiscovererConfig config, Domain domain, RealmModel realm, UserModel user, String username) {
         final Map<String, String> linkedIdps;
 
-        EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
         if (user == null || !config.forwardToLinkedIdp()) {
             linkedIdps = Collections.emptyMap();
             LOG.tracef(
@@ -84,17 +88,17 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
             LOG.tracef(
                 "Found local user '%s' and forwarding to linked IdP is enabled. Discovering linked IdPs.",
                 username);
-            linkedIdps = context.getSession().users()
-                .getFederatedIdentitiesStream(context.getRealm(), user)
+            linkedIdps = users
+                .getFederatedIdentitiesStream(realm, user)
                 .collect(
                     Collectors.toMap(FederatedIdentityModel::getIdentityProvider, FederatedIdentityModel::getUserName));
         }
 
-        List<IdentityProviderModel> candidateIdps = identityProviders.candidatesForHomeIdp(context, user);
+        List<IdentityProviderModel> candidateIdps = identityProviders.candidatesForHomeIdp(realm, user);
         if (candidateIdps == null) {
             candidateIdps = emptyList();
         }
-        List<IdentityProviderModel> idpsWithMatchingDomain = identityProviders.withMatchingDomain(context, candidateIdps, domain);
+        List<IdentityProviderModel> idpsWithMatchingDomain = identityProviders.withMatchingDomain(config, candidateIdps, domain);
         if (idpsWithMatchingDomain == null) {
             idpsWithMatchingDomain = emptyList();
         }
