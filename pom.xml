@@ -57,7 +57,7 @@
         <keycloak.version>${version.keycloak}</keycloak.version>
 
         <version.mockito>5.18.0</version.mockito>
-        <version.testcontainers>1.21.1</version.testcontainers>
+        <version.testcontainers>1.21.2</version.testcontainers>
         <version.selenium>4.33.0</version.selenium>
     </properties>
 
