@@ -1,10 +1,10 @@
 package de.sventorben.keycloak.authentication.hidpd;
 
 import org.jboss.logging.Logger;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.ModelDuplicateException;
-import org.keycloak.models.UserModel;
+import org.keycloak.models.*;
 import org.keycloak.models.utils.KeycloakModelUtils;
+
+import java.util.stream.Stream;
 
 public final class Users {
 
@@ -26,4 +26,7 @@ public final class Users {
         return user;
     }
 
+    public Stream<FederatedIdentityModel> getFederatedIdentitiesStream(RealmModel realm, UserModel user) {
+        return keycloakSession.users().getFederatedIdentitiesStream(realm, user);
+    }
 }

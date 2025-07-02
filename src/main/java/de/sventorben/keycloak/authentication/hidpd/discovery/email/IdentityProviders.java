@@ -1,6 +1,7 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
 import de.sventorben.keycloak.authentication.hidpd.PublicAPI;
+import de.sventorben.keycloak.authentication.hidpd.discovery.HomeIdpDiscovererConfig;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.IdentityProviderModel;
@@ -32,7 +33,7 @@ public interface IdentityProviders {
      * Filters the given list of identity provider candidates to return those that match a specified
      * domain within the context of an authentication flow.
      *
-     * @param context The authentication flow context providing runtime information about the
+     * @param discovererConfig The authentication flow context providing runtime information about the
      *                current authentication process.
      * @param candidates A list of potentially eligible identity providers that may be suitable
      *                   for the user based on initial criteria (see {@code #candidatesForHomeIdp}).
@@ -40,7 +41,7 @@ public interface IdentityProviders {
      * @return A filtered list of {@link IdentityProviderModel} that match the specified domain criteria.
      * May be empty but not {@code null}.
      */
-    List<IdentityProviderModel> withMatchingDomain(AuthenticationFlowContext context, List<IdentityProviderModel> candidates, Domain domain);
+    List<IdentityProviderModel> withMatchingDomain(HomeIdpDiscovererConfig discovererConfig, List<IdentityProviderModel> candidates, Domain domain);
 
     /**
      * Retrieves a list of identity providers that are candidates for being the user's home IdP.
@@ -51,8 +52,7 @@ public interface IdentityProviders {
      *                current authentication process.
      * @return A list of {@link IdentityProviderModel} from the realm. May be empty but not {@code null}.
      */
-    default List<IdentityProviderModel> candidatesForHomeIdp(AuthenticationFlowContext context, UserModel user) {
-        RealmModel realm = context.getRealm();
+    default List<IdentityProviderModel> candidatesForHomeIdp(RealmModel realm, UserModel user) {
         List<IdentityProviderModel> enabledIdps = realm.getIdentityProvidersStream()
             .filter(IdentityProviderModel::isEnabled)
             .collect(Collectors.toList());
