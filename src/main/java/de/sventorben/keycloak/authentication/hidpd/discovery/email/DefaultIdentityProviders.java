@@ -1,7 +1,7 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.email;
 
+import de.sventorben.keycloak.authentication.hidpd.discovery.HomeIdpDiscovererConfig;
 import org.jboss.logging.Logger;
-import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.IdentityProviderModel;
 
 import java.util.List;
@@ -11,10 +11,10 @@ final class DefaultIdentityProviders implements IdentityProviders {
 
     private static final Logger LOG = Logger.getLogger(DefaultIdentityProviders.class);
 
+
     @Override
-    public List<IdentityProviderModel> withMatchingDomain(AuthenticationFlowContext context, List<IdentityProviderModel> candidates, Domain domain) {
-        EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
-        String userAttributeName = config.userAttribute();
+    public List<IdentityProviderModel> withMatchingDomain(HomeIdpDiscovererConfig discovererConfig, List<IdentityProviderModel> candidates, Domain domain) {
+        String userAttributeName = discovererConfig.userAttribute();
         List<IdentityProviderModel> idpsWithMatchingDomain = candidates.stream()
             .filter(it -> new IdentityProviderModelConfig(it).supportsDomain(userAttributeName, domain))
             .collect(Collectors.toList());
@@ -22,5 +22,4 @@ final class DefaultIdentityProviders implements IdentityProviders {
             idpsWithMatchingDomain.stream().map(IdentityProviderModel::getAlias).collect(Collectors.joining(",")));
         return idpsWithMatchingDomain;
     }
-
 }
