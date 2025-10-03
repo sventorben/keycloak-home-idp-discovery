@@ -51,14 +51,14 @@
         <maven.compiler.release>17</maven.compiler.release>
 
         <!-- For compilation -->
-        <version.keycloak>26.3.5</version.keycloak>
+        <version.keycloak>26.4.0</version.keycloak>
 
         <!-- For compatibility tests -->
         <keycloak.version>${version.keycloak}</keycloak.version>
 
         <version.mockito>5.18.0</version.mockito>
         <version.testcontainers>1.21.3</version.testcontainers>
-        <version.selenium>4.33.0</version.selenium>
+        <version.selenium>4.34.0</version.selenium>
     </properties>
 
     <build>
@@ -161,7 +161,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.13.2</version>
+                <version>6.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -236,7 +236,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.27.3</version>
+            <version>3.27.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -267,14 +267,14 @@
         <dependency>
             <groupId>com.github.dasniko</groupId>
             <artifactId>testcontainers-keycloak</artifactId>
-            <version>3.7.0</version>
+            <version>3.8.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
-            <version>26.0.5</version>
+            <version>26.0.6</version>
             <scope>test</scope>
         </dependency>
         <!-- Logging -->

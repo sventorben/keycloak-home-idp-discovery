@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
         java-version: 17
@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        keycloak_version: [ 26.1.5, 26.2.5, 26.3.0, 26.3.1, 26.3.2, 26.3.3, 26.3.4, 26.3.5, latest ]
+        keycloak_version: [ 26.1.5, 26.2.5, 26.3.5, 26.4.0, latest ]
         experimental: [false]
         include:
             - keycloak_version: nightly
@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: 17
