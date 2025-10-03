@@ -14,6 +14,8 @@ import org.keycloak.admin.client.Keycloak;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.BrowserWebDriverContainer.VncRecordingMode;
 import org.testcontainers.containers.Network;
@@ -564,6 +566,7 @@ class HomeIdpDiscoveryIT {
     }
 
     private void assertRedirectedTo(String url) {
+        new WebDriverWait(webDriver, Duration.ofSeconds(5)).until(ExpectedConditions.urlContains(url));
         assertThat(webDriver.getCurrentUrl()).startsWith(url);
     }
 
