@@ -1,12 +1,10 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.orgs.email;
 
+import de.sventorben.keycloak.authentication.hidpd.discovery.HomeIdpDiscovererConfig;
 import de.sventorben.keycloak.authentication.hidpd.discovery.email.Domain;
 import de.sventorben.keycloak.authentication.hidpd.discovery.email.IdentityProviders;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.models.IdentityProviderModel;
-import org.keycloak.models.OrganizationDomainModel;
-import org.keycloak.models.OrganizationModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.models.*;
 import org.keycloak.organization.OrganizationProvider;
 
 import java.util.ArrayList;
@@ -17,9 +15,15 @@ import java.util.stream.Stream;
 
 final class OrgsIdentityProviders implements IdentityProviders {
 
+    private final KeycloakSession keycloakSession;
+
+    OrgsIdentityProviders(KeycloakSession keycloakSession) {
+        this.keycloakSession = keycloakSession;
+    }
+
     @Override
-    public List<IdentityProviderModel> candidatesForHomeIdp(AuthenticationFlowContext context, UserModel user) {
-        OrganizationProvider orgProvider = context.getSession().getProvider(OrganizationProvider.class);
+    public List<IdentityProviderModel> candidatesForHomeIdp(RealmModel realm, UserModel user) {
+        OrganizationProvider orgProvider = keycloakSession.getProvider(OrganizationProvider.class);
         if (user == null) {
             return Collections.emptyList();
         }
@@ -39,8 +43,8 @@ final class OrgsIdentityProviders implements IdentityProviders {
     }
 
     @Override
-    public List<IdentityProviderModel> withMatchingDomain(AuthenticationFlowContext context, List<IdentityProviderModel> candidates, Domain domain) {
-        OrganizationProvider orgProvider = context.getSession().getProvider(OrganizationProvider.class);
+    public List<IdentityProviderModel> withMatchingDomain(HomeIdpDiscovererConfig discovererConfig, List<IdentityProviderModel> candidates, Domain domain) {
+        OrganizationProvider orgProvider = keycloakSession.getProvider(OrganizationProvider.class);
         if (orgProvider.isEnabled()) {
             OrganizationModel org = orgProvider.getByDomainName(domain.getRawValue());
             if (org != null && org.isEnabled()) {
