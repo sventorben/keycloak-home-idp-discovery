@@ -13,7 +13,7 @@ jobs:
         extension_version: [ 21.3.0, 22.0.0, 22.1.0, 23.0.0, 24.0.0, 24.1.0, 25.0.1, 26.0.0, 26.1.1]
     name: KC ${{ matrix.keycloak_version }}, Extension ${{ matrix.extension_version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
             ref: v${{ matrix.extension_version }}
       - name: Set up JDK 17
