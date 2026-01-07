@@ -5,7 +5,7 @@ import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationProcessor;
 import org.keycloak.broker.provider.AuthenticationRequest;
-import org.keycloak.broker.provider.IdentityProvider;
+import org.keycloak.broker.provider.UserAuthenticationIdentityProvider;
 import org.keycloak.broker.provider.util.IdentityBrokerState;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.KeycloakSession;
@@ -44,13 +44,13 @@ final class Redirector {
             return;
         }
         new HomeIdpAuthenticationFlowContext(context).loginHint().copyTo(clientSessionCode);
-        IdentityProvider<?> identityProvider = getIdentityProvider(keycloakSession, idp.getAlias());
+        UserAuthenticationIdentityProvider<?> identityProvider = getIdentityProvider(keycloakSession, idp.getAlias());
 
         Response response = identityProvider.performLogin(createAuthenticationRequest(providerAlias, identityProvider, clientSessionCode));
         context.forceChallenge(response);
     }
 
-    private AuthenticationRequest createAuthenticationRequest(String providerAlias, IdentityProvider<?> identityProvider, ClientSessionCode<AuthenticationSessionModel> clientSessionCode) {
+    private AuthenticationRequest createAuthenticationRequest(String providerAlias, UserAuthenticationIdentityProvider<?> identityProvider, ClientSessionCode<AuthenticationSessionModel> clientSessionCode) {
         AuthenticationSessionModel authSession = null;
         IdentityBrokerState encodedState = null;
 
