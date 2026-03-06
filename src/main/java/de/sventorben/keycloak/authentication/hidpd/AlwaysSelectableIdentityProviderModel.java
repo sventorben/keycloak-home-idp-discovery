@@ -12,7 +12,7 @@ final class AlwaysSelectableIdentityProviderModel extends IdentityProviderModel 
     }
 
     @Override
-    public boolean isHideOnLogin() {
+    public Boolean isHideOnLogin() {
         return false;
     }
 
