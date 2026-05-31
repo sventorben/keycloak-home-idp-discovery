@@ -78,6 +78,10 @@ public class TestRealmLoginPage {
         assertThat(rememberMe.isSelected()).isFalse();
     }
 
+    public void assertRememberMe(boolean on) {
+        assertThat(rememberMe.isSelected()).isEqualTo(on);
+    }
+
     public void assertLoginForClient(String clientId) {
         assertThat(webDriver.getCurrentUrl()).contains("client_id=" + clientId);
     }
@@ -107,4 +111,5 @@ public class TestRealmLoginPage {
     public void assertPasswordFieldIsNotDisplayed() {
         assertThat(webDriver.findElements(By.id("password")).isEmpty()).isTrue();
     }
+
 }

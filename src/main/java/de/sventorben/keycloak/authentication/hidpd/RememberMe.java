@@ -29,14 +29,18 @@ final class RememberMe {
      * Sets session notes for interoperability with other authenticators and Keycloak defaults
      */
     void handleAction(MultivaluedMap<String, String> formData) {
-        boolean remember = context.getRealm().isRememberMe() &&
-            "on".equalsIgnoreCase(formData.getFirst("rememberMe"));
+        boolean remember = isOn(formData);
         if (remember) {
             context.getAuthenticationSession().setAuthNote(Details.REMEMBER_ME, "true");
             context.getEvent().detail(Details.REMEMBER_ME, "true");
         } else {
             context.getAuthenticationSession().removeAuthNote(Details.REMEMBER_ME);
         }
+    }
+
+    boolean isOn(MultivaluedMap<String, String> formData) {
+        return context.getRealm().isRememberMe() &&
+            "on".equalsIgnoreCase(formData.getFirst("rememberMe"));
     }
 
     String getUserName() {

@@ -183,6 +183,29 @@ class HomeIdpDiscoveryIT {
             assertThat(cookies.stream().map(Cookie::getName).collect(Collectors.toList()))
                 .doesNotContain(COOKIE_NAME_REMEMBER_ME);
         }
+
+        @Test
+        @DisplayName("Given the user has checked 'remember me' feature and no Hom IdP for user exists, remember user in cookie")
+        public void testUserGetsRememberedThoughNotRedirected() {
+            accountConsolePage().open();
+
+            TestRealmLoginPage testRealmLoginPage = testRealmLoginPage();
+            testRealmLoginPage.enableRememberMe();
+            testRealmLoginPage.signIn("test6@local.local");
+            assertNotRedirected();
+
+            Set<Cookie> cookies = webDriver.manage().getCookies();
+            assertThat(cookies).anySatisfy(c -> {
+                assertThat(c.getName()).isEqualTo(COOKIE_NAME_REMEMBER_ME);
+                assertThat(c.getValue()).isEqualTo("\"username:test6%40local.local\"");
+                assertThat(c.getPath()).isEqualTo("/realms/test-realm/");
+                assertThat(c.getDomain()).isEqualTo("keycloak");
+                assertThat(c.getSameSite()).isEqualTo("Lax");
+                assertThat(c.getExpiry()).isAfter(new Date());
+            });
+
+            testRealmLoginPage.assertRememberMe(true);
+        }
     }
 
     @Nested
