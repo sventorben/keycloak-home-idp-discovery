@@ -68,7 +68,7 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
             LOG.warnf("Could not extract domain from email address '%s'", username);
         }
 
-        if (user != null && homeIdps.isEmpty()) {
+        if (homeIdps.isEmpty()) {
             homeIdps = discoverHomeIdps(context, user);
         }
         return homeIdps;
@@ -79,7 +79,14 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
         EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
 
         List<IdentityProviderModel> candidateIdps = new ArrayList<>();
-        if (!config.forwardToLinkedIdp() || !config.forwardUserWithNoEmail()) {
+        if (user == null || !config.forwardToLinkedIdp()) {
+            LOG.tracef(
+                "User is null and not stored locally or forwarding to linked IdP is disabled. Skipping discovery of linked IdPs.");
+            return candidateIdps;
+        }
+        if (!config.forwardUserWithNoEmail()) {
+            LOG.tracef(
+                "Forwarding user without email enabled is disabled. Skipping discovery of linked IdPs.");
             return candidateIdps;
         }
 
