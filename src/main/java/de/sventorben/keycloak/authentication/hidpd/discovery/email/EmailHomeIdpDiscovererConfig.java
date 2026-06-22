@@ -15,6 +15,7 @@ final class EmailHomeIdpDiscovererConfig {
     private static final String FORWARD_TO_LINKED_IDP = "forwardToLinkedIdp";
     private static final String USER_ATTRIBUTE = "userAttribute";
     private static final String FORWARD_UNVERIFIED_ATTRIBUTE = "forwardUnverifiedEmail";
+    private static final String FORWARD_NO_EMAIL_ATTRIBUTE = "forwardNoEmail";
 
     private static final ProviderConfigProperty FORWARD_TO_LINKED_IDP_PROPERTY = new ProviderConfigProperty(
         FORWARD_TO_LINKED_IDP,
@@ -40,10 +41,19 @@ final class EmailHomeIdpDiscovererConfig {
         false,
         false);
 
+    private static final ProviderConfigProperty FORWARD_NO_EMAIL_PROPERTY = new ProviderConfigProperty(
+        FORWARD_NO_EMAIL_ATTRIBUTE,
+        "Forward users with no email",
+        "Whether to forward existing user to a linked identity provider if they don't have an email set.",
+        BOOLEAN_TYPE,
+        false,
+        false);
+
     static final List<ProviderConfigProperty> CONFIG_PROPERTIES = ProviderConfigurationBuilder.create()
         .property(USER_ATTRIBUTE_PROPERTY)
         .property(FORWARD_UNVERIFIED_PROPERTY)
         .property(FORWARD_TO_LINKED_IDP_PROPERTY)
+        .property(FORWARD_NO_EMAIL_PROPERTY)
         .build();
     private final AuthenticatorConfigModel authenticatorConfigModel;
 
@@ -66,6 +76,12 @@ final class EmailHomeIdpDiscovererConfig {
     boolean forwardUserWithUnverifiedEmail() {
         return Optional.ofNullable(authenticatorConfigModel)
             .map(it -> Boolean.parseBoolean(it.getConfig().getOrDefault(FORWARD_UNVERIFIED_ATTRIBUTE, "false")))
+            .orElse(false);
+    }
+
+    boolean forwardUserWithNoEmail() {
+        return Optional.ofNullable(authenticatorConfigModel)
+            .map(it -> Boolean.parseBoolean(it.getConfig().getOrDefault(FORWARD_NO_EMAIL_ATTRIBUTE, "false")))
             .orElse(false);
     }
 

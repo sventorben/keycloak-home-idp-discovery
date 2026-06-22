@@ -68,7 +68,40 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
             LOG.warnf("Could not extract domain from email address '%s'", username);
         }
 
+        if (user != null && homeIdps.isEmpty()) {
+            homeIdps = discoverHomeIdps(context, user);
+        }
         return homeIdps;
+    }
+
+
+    private List<IdentityProviderModel> discoverHomeIdps(AuthenticationFlowContext context, UserModel user) {
+        EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
+
+        List<IdentityProviderModel> candidateIdps = new ArrayList<>();
+        if (!config.forwardToLinkedIdp() || !config.forwardUserWithNoEmail()) {
+            return candidateIdps;
+        }
+
+        LOG.tracef(
+            "User '%s' exists, forwarding user without email enabled, and forwarding to linked IdP is enabled. Attempting to discover linked IdPs.",
+            user.getId());
+
+        Map<String, String> linkedIdps = context.getSession().users()
+                .getFederatedIdentitiesStream(context.getRealm(), user)
+                .collect(Collectors.toMap(FederatedIdentityModel::getIdentityProvider,
+                        FederatedIdentityModel::getUserName));
+        if (!linkedIdps.isEmpty()) {
+            candidateIdps = identityProviders.candidatesForHomeIdp(context, user);
+            if (candidateIdps != null) {
+                List<IdentityProviderModel> userIdps = getLinkedIdpsFrom(candidateIdps, linkedIdps);
+                if (!userIdps.isEmpty()) {
+                    logFoundIdps("linked", "matching", userIdps, null, user.getUsername());
+                    LOG.tracef("Found %d linked IdPs as fallback for user '%s'", userIdps.size(), user.getUsername());
+                }
+            }
+        }
+        return candidateIdps;
     }
 
     private List<IdentityProviderModel> discoverHomeIdps(AuthenticationFlowContext context, Domain domain, UserModel user, String username) {
