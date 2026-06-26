@@ -74,6 +74,18 @@ final class AuthenticatorConfig {
         updateProperty("forwardToFirstMatch", enabled);
     }
 
+    void enableForwardUserWithNoEmail() {
+        setForwardUserWithNoEmail(true);
+    }
+
+    void disableForwardUserWithNoEmail() {
+        setForwardUserWithNoEmail(false);
+    }
+
+    private void setForwardUserWithNoEmail(Boolean enabled) {
+        updateProperty("forwardNoEmail", enabled);
+    }
+
     void resetAuthenticatorConfig() {
         disableForwarding();
         disableBypassLoginPage();
