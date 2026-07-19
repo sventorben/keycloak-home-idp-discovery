@@ -553,88 +553,89 @@ class HomeIdpDiscoveryIT {
         }
     }
 
-    @Nested  
-    @DisplayName("Given user with linked IdP but no email")  
-    class GivenUserWithLinkedIdpButNoEmail {  
-    
-        private String username = "test7";  
-    
-        @Nested  
-        @DisplayName("and given forwarding to linked IdPs and forwarding user without email are both enabled")  
-        class AndBothForwardingEnabled {  
-    
-            @BeforeEach  
-            public void setUp() {  
-                authenticatorConfig.enableForwarding();  
-                authenticatorConfig.enableForwardUserWithNoEmail();  
-                accountConsolePage().open();  
-            }  
-    
-            @Test  
-            @DisplayName("then redirect to linked IdP")  
-            public void willRedirectToLinkedIdp() {  
-                testRealmLoginPage().signIn(username);  
-                assertRedirectedToIdp();  
-            }  
-    
-            @Test  
-            @DisplayName("then pass login_hint parameter to downstream IdP")  
-            public void willForwardLoginHint() {  
-                testRealmLoginPage().signIn(username);  
-                assertThat(webDriver.getCurrentUrl()).contains("&login_hint=idp-test7-username&");  
-            }  
-        }  
-    
-        @Nested  
-        @DisplayName("and given forwarding to linked IdPs is disabled")  
-        class ButForwardingToLinkedIdpDisabled {  
-    
-            @BeforeEach  
-            public void setUp() {  
-                authenticatorConfig.disableForwarding();  
-                authenticatorConfig.enableForwardUserWithNoEmail();  
-                accountConsolePage().open();  
-                testRealmLoginPage().signIn(username);  
-            }  
-    
-            @Test  
-            @DisplayName("then do not redirect")  
-            public void willNotRedirectToIdp() {  
-                assertNotRedirected();  
-            }  
-    
-            @Test  
-            @DisplayName("then ask for password")  
-            public void willAskForPassword() {  
-                testRealmLoginPage().assertPasswordFieldIsDisplayed();  
-            }  
-        }  
-    
-        @Nested  
-        @DisplayName("and given forwarding user without email is disabled")  
-        class ButForwardingUserWithoutNoEmailDisabled {  
-    
-            @BeforeEach  
-            public void setUp() {  
-                authenticatorConfig.enableForwarding();  
-                authenticatorConfig.disableForwardUserWithNoEmail();  
-                accountConsolePage().open();  
-                testRealmLoginPage().signIn(username);  
-            }  
-    
-            @Test  
-            @DisplayName("then do not redirect")  
-            public void willNotRedirectToIdp() {  
-                assertNotRedirected();  
-            }  
-    
-            @Test  
-            @DisplayName("then ask for password")  
-            public void willAskForPassword() {  
-                testRealmLoginPage().assertPasswordFieldIsDisplayed();  
-            }  
-        }  
+    @Nested
+    @DisplayName("Given user with linked IdP but no email")
+    class GivenUserWithLinkedIdpButNoEmail {
+
+        private final String username = "test7";
+
+        @Nested
+        @DisplayName("and given forwarding to linked IdPs and forwarding user without email are both enabled")
+        class AndBothForwardingEnabled {
+
+            @BeforeEach
+            public void setUp() {
+                authenticatorConfig.enableForwarding();
+                authenticatorConfig.enableForwardUserWithNoEmail();
+                accountConsolePage().open();
+            }
+
+            @Test
+            @DisplayName("then redirect to linked IdP")
+            public void willRedirectToLinkedIdp() {
+                testRealmLoginPage().signIn(username);
+                assertRedirectedToIdp();
+            }
+
+            @Test
+            @DisplayName("then pass login_hint parameter to downstream IdP")
+            public void willForwardLoginHint() {
+                testRealmLoginPage().signIn(username);
+                assertThat(webDriver.getCurrentUrl()).contains("&login_hint=idp-test7-username&");
+            }
+        }
+
+        @Nested
+        @DisplayName("and given forwarding to linked IdPs is disabled")
+        class ButForwardingToLinkedIdpDisabled {
+
+            @BeforeEach
+            public void setUp() {
+                authenticatorConfig.disableForwarding();
+                authenticatorConfig.enableForwardUserWithNoEmail();
+                accountConsolePage().open();
+                testRealmLoginPage().signIn(username);
+            }
+
+            @Test
+            @DisplayName("then do not redirect")
+            public void willNotRedirectToIdp() {
+                assertNotRedirected();
+            }
+
+            @Test
+            @DisplayName("then ask for password")
+            public void willAskForPassword() {
+                testRealmLoginPage().assertPasswordFieldIsDisplayed();
+            }
+        }
+
+        @Nested
+        @DisplayName("and given forwarding user without email is disabled")
+        class ButForwardingUserWithoutNoEmailDisabled {
+
+            @BeforeEach
+            public void setUp() {
+                authenticatorConfig.enableForwarding();
+                authenticatorConfig.disableForwardUserWithNoEmail();
+                accountConsolePage().open();
+                testRealmLoginPage().signIn(username);
+            }
+
+            @Test
+            @DisplayName("then do not redirect")
+            public void willNotRedirectToIdp() {
+                assertNotRedirected();
+            }
+
+            @Test
+            @DisplayName("then ask for password")
+            public void willAskForPassword() {
+                testRealmLoginPage().assertPasswordFieldIsDisplayed();
+            }
+        }
     }
+
     private SelectIdpPage selectIdpPage() {
         return new SelectIdpPage(webDriver, KEYCLOAK_BASE_URL);
     }
