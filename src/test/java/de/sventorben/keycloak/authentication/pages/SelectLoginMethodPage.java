@@ -13,6 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SelectLoginMethodPage {
 
+    private static final String LOGIN_ACTIONS_PATH = "/realms/test-realm/login-actions/authenticate";
+
     private final WebDriver webDriver;
     private final String keycloakBaseUrl;
 
@@ -26,8 +28,8 @@ public class SelectLoginMethodPage {
         this.webDriver = webDriver;
         this.keycloakBaseUrl = keycloakBaseUrl;
         PageFactory.initElements(webDriver, this);
-        assertThat(webDriver.getCurrentUrl()).startsWith(
-            keycloakBaseUrl + "/realms/test-realm/login-actions/authenticate");
+        Navigation.awaitUrlStartingWith(webDriver, keycloakBaseUrl + LOGIN_ACTIONS_PATH);
+        assertThat(webDriver.getCurrentUrl()).startsWith(keycloakBaseUrl + LOGIN_ACTIONS_PATH);
         assertThat(pageTitle.getText()).isEqualTo("Select login method");
     }
 

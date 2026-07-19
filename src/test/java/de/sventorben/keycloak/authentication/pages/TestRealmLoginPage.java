@@ -44,24 +44,22 @@ public class TestRealmLoginPage {
     }
 
     private void waitForLoginPage() {
-        new WebDriverWait(webDriver, Duration.ofSeconds(5))
-            .until((driver) -> {
-                String currentUrl = driver.getCurrentUrl();
-                return currentUrl.startsWith(keycloakBaseUrl + OIDC_AUTH_PATH)
-                    || currentUrl.startsWith(keycloakBaseUrl + LOGIN_ACTIONS_PATH);
-            }
-        );
+        // The URL alone cannot tell us the page has arrived: the browser already sits on the OIDC
+        // auth path before navigating, so a URL check is satisfied on the first poll and returns
+        // while the previous page is still on screen. Wait for the form itself instead.
+        new WebDriverWait(webDriver, Duration.ofSeconds(10))
+            .until(ExpectedConditions.visibilityOf(usernameInput));
     }
 
     public void signIn(String username) {
         new WebDriverWait(webDriver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOf(usernameInput));
         usernameInput.sendKeys(username);
-        signInButton.click();
+        Navigation.clickAndAwaitNavigation(webDriver, signInButton);
     }
 
     public void tryAnotherWay() {
         new WebDriverWait(webDriver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOf(tryAnotherWayLink));
-        tryAnotherWayLink.click();
+        Navigation.clickAndAwaitNavigation(webDriver, tryAnotherWayLink);
     }
 
     public void enableRememberMe() {

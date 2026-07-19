@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SelectIdpPage {
 
+    private static final String LOGIN_ACTIONS_PATH = "/realms/test-realm/login-actions/authenticate";
+
     private final WebDriver webDriver;
     private final String keycloakBaseUrl;
 
@@ -23,8 +25,8 @@ public class SelectIdpPage {
     }
 
     public void assertOnPage() {
-        assertThat(webDriver.getCurrentUrl()).startsWith(
-            keycloakBaseUrl + "/realms/test-realm/login-actions/authenticate");
+        Navigation.awaitUrlStartingWith(webDriver, keycloakBaseUrl + LOGIN_ACTIONS_PATH);
+        assertThat(webDriver.getCurrentUrl()).startsWith(keycloakBaseUrl + LOGIN_ACTIONS_PATH);
         assertPageTitle();
     }
 
@@ -34,6 +36,6 @@ public class SelectIdpPage {
 
     public void selectIdp(String idpAlias) {
         WebElement idpLoginLink = webDriver.findElements(By.id("social-" + idpAlias)).get(0);
-        idpLoginLink.click();
+        Navigation.clickAndAwaitNavigation(webDriver, idpLoginLink);
     }
 }

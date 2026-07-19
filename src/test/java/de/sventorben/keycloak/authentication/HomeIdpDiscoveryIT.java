@@ -2,6 +2,7 @@ package de.sventorben.keycloak.authentication;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import de.sventorben.keycloak.authentication.pages.AccountConsolePage;
+import de.sventorben.keycloak.authentication.pages.Navigation;
 import de.sventorben.keycloak.authentication.pages.SelectIdpPage;
 import de.sventorben.keycloak.authentication.pages.TestRealmLoginPage;
 import de.sventorben.keycloak.authentication.pages.UpstreamIdpMock;
@@ -295,7 +296,11 @@ class HomeIdpDiscoveryIT {
                 public void whenRestartingFlow() {
                     upstreamIdpMock().redirectToDownstreamWithLoginHint("test", null);
                     testRealmLoginPage().signIn(usernameWithMultipleIdps);
-                    String restartUrl = webDriver.getCurrentUrl().replace("/authenticate", "/restart") + "&skip_logout=false";
+                    String authenticateUrl = webDriver.getCurrentUrl();
+                    // Fail loudly rather than silently navigating to an unchanged URL if the sign-in
+                    // navigation has not completed.
+                    assertThat(authenticateUrl).contains("/authenticate");
+                    String restartUrl = authenticateUrl.replace("/authenticate", "/restart") + "&skip_logout=false";
                     webDriver.navigate().to(restartUrl);
 
                     testRealmLoginPage().assertUsernameFieldIsDisplayed();
@@ -452,7 +457,7 @@ class HomeIdpDiscoveryIT {
         @Test
         @DisplayName("then pass login_hint parameter to downstream IdP")
         public void willForwardLoginHint() {
-            assertThat(webDriver.getCurrentUrl()).contains("&login_hint=someone%40example.com&");
+            assertUrlContains("&login_hint=someone%40example.com&");
         }
     }
 
@@ -548,7 +553,7 @@ class HomeIdpDiscoveryIT {
             @DisplayName("then pass login_hint parameter to downstream IdP")
             public void willForwardLoginHint() {
                 testRealmLoginPage().signIn(username);
-                assertThat(webDriver.getCurrentUrl()).contains("&login_hint=idp-test5-username&");
+                assertUrlContains("&login_hint=idp-test5-username&");
             }
         }
     }
@@ -580,7 +585,12 @@ class HomeIdpDiscoveryIT {
 
     private void assertRedirectedToIdp(String idpAlias) {
         assertRedirectedTo(KEYCLOAK_BASE_URL + "/realms/idp/protocol/openid-connect/auth");
-        assertThat(webDriver.getCurrentUrl()).contains("broker%2F" + idpAlias + "%2F");
+        assertUrlContains("broker%2F" + idpAlias + "%2F");
+    }
+
+    private void assertUrlContains(String fragment) {
+        Navigation.awaitUrlContaining(webDriver, fragment);
+        assertThat(webDriver.getCurrentUrl()).contains(fragment);
     }
 
     private void assertNotRedirected() {
