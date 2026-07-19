@@ -17,11 +17,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # An explicit permissions block is exhaustive: every scope not listed here is denied, even
+    # those the repository default would otherwise grant.
     permissions:
-      contents: write       # create the GitHub Release / push tag
+      contents: write        # create the GitHub Release / push tag
       packages: write        # publish to GitHub Packages
       id-token: write        # build-provenance attestation
       attestations: write    # build-provenance attestation
+      pull-requests: write   # open the next-development-iteration PR
 
     steps:
     - name: Checkout
