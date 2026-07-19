@@ -68,7 +68,7 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
             LOG.warnf("Could not extract domain from email address '%s'", username);
         }
 
-        if (homeIdps.isEmpty() && user != null) { 
+        if (homeIdps.isEmpty() && user != null) {
             String attribute = user.getFirstAttribute(config.userAttribute());
             if (attribute == null || attribute.isBlank()) {
                 homeIdps = discoverHomeIdps(context, user);
@@ -82,13 +82,13 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
         EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
 
         if (user == null || !config.forwardToLinkedIdp()) {
-            LOG.tracef(
-                "User is null and not stored locally or forwarding to linked IdP is disabled. Skipping discovery of linked IdPs.");
+            LOG.trace(
+                "User is not stored locally or forwarding to linked IdP is disabled. Skipping discovery of linked IdPs.");
             return Collections.emptyList();
         }
         if (!config.forwardUserWithNoEmail()) {
-            LOG.tracef(
-                "Forwarding user without email enabled is disabled. Skipping discovery of linked IdPs.");
+            LOG.trace(
+                "Forwarding users without email is disabled. Skipping discovery of linked IdPs.");
             return Collections.emptyList();
         }
 
@@ -107,7 +107,7 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
         }
         List<IdentityProviderModel> userIdps = getLinkedIdpsFrom(candidateIdps, linkedIdps);
         if (!userIdps.isEmpty()) {
-            logFoundIdps("linked", "non-matching", userIdps, null, user.getUsername());
+            logFoundIdps("linked", "non-matching", userIdps, user.getUsername());
         }
         return userIdps;
     }
@@ -168,6 +168,14 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
             .collect(Collectors.joining(","));
         LOG.tracef("Found %s IdPs [%s] with %s domain '%s' for user '%s'",
             idpQualifier, homeIdpsString, domainQualifier, domain, username);
+    }
+
+    private void logFoundIdps(String idpQualifier, String domainQualifier, List<IdentityProviderModel> homeIdps, String username) {
+        String homeIdpsString = homeIdps.stream()
+            .map(IdentityProviderModel::getAlias)
+            .collect(Collectors.joining(","));
+        LOG.tracef("Found %s IdPs [%s] with %s domains for user '%s'",
+            idpQualifier, homeIdpsString, domainQualifier, username);
     }
 
     private List<IdentityProviderModel> getLinkedIdpsFrom(List<IdentityProviderModel> enabledIdpsWithMatchingDomain, Map<String, String> linkedIdps) {
