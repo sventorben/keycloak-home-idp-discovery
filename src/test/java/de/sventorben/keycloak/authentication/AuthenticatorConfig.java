@@ -92,6 +92,7 @@ final class AuthenticatorConfig {
         setUserAttribute("email");
         enableForwardToFirstMatch();
         disableForwardingUnverifiedEmails();
+        disableForwardUserWithNoEmail();
     }
 
     private void updateProperty(String propertyName, Boolean enabled) {
