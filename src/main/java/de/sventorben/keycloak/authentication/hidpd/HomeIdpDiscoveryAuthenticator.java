@@ -32,6 +32,18 @@ final class HomeIdpDiscoveryAuthenticator extends AbstractUsernameFormAuthentica
     @Override
     public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
         HomeIdpAuthenticationFlowContext context = new HomeIdpAuthenticationFlowContext(authenticationFlowContext);
+
+        if (context.singleSignOn().established()) {
+            // Since Keycloak 26.1 the cookie authenticator no longer completes the flow when an
+            // organization scope is requested; it defers to the organization authenticator, which
+            // resolves the organization and only then succeeds. Flows built around this
+            // authenticator have no such execution, so without this the user would be challenged
+            // again despite holding a valid session. See issue #533.
+            LOG.debugf("User is already authenticated via SSO, skipping discovery");
+            authenticationFlowContext.success();
+            return;
+        }
+
         if (context.loginPage().shouldByPass()) {
             String usernameHint = usernameHint(authenticationFlowContext, context);
             if (usernameHint != null) {

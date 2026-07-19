@@ -16,6 +16,7 @@ final class HomeIdpAuthenticationFlowContext {
     private BaseUriLoginFormsProvider loginFormsProvider;
     private LoginForm loginForm;
     private Reauthentication reauthentication;
+    private SingleSignOn singleSignOn;
 
     HomeIdpAuthenticationFlowContext(AuthenticationFlowContext context) {
         this.context = context;
@@ -89,5 +90,12 @@ final class HomeIdpAuthenticationFlowContext {
             reauthentication = new Reauthentication(context);
         }
         return reauthentication;
+    }
+
+    SingleSignOn singleSignOn() {
+        if (singleSignOn == null) {
+            singleSignOn = new SingleSignOn(context);
+        }
+        return singleSignOn;
     }
 }
