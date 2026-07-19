@@ -68,8 +68,11 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
             LOG.warnf("Could not extract domain from email address '%s'", username);
         }
 
-        if (homeIdps.isEmpty()) {
-            homeIdps = discoverHomeIdps(context, user);
+        if (homeIdps.isEmpty() && user != null) { 
+            String attribute = user.getFirstAttribute(config.userAttribute());
+            if (attribute == null || attribute.isBlank()) {
+                homeIdps = discoverHomeIdps(context, user);
+            }
         }
         return homeIdps;
     }
@@ -78,16 +81,15 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
     private List<IdentityProviderModel> discoverHomeIdps(AuthenticationFlowContext context, UserModel user) {
         EmailHomeIdpDiscovererConfig config = new EmailHomeIdpDiscovererConfig(context.getAuthenticatorConfig());
 
-        List<IdentityProviderModel> candidateIdps = new ArrayList<>();
         if (user == null || !config.forwardToLinkedIdp()) {
             LOG.tracef(
                 "User is null and not stored locally or forwarding to linked IdP is disabled. Skipping discovery of linked IdPs.");
-            return candidateIdps;
+            return Collections.emptyList();
         }
         if (!config.forwardUserWithNoEmail()) {
             LOG.tracef(
                 "Forwarding user without email enabled is disabled. Skipping discovery of linked IdPs.");
-            return candidateIdps;
+            return Collections.emptyList();
         }
 
         LOG.tracef(
@@ -98,17 +100,16 @@ public final class EmailHomeIdpDiscoverer implements HomeIdpDiscoverer {
                 .getFederatedIdentitiesStream(context.getRealm(), user)
                 .collect(Collectors.toMap(FederatedIdentityModel::getIdentityProvider,
                         FederatedIdentityModel::getUserName));
-        if (!linkedIdps.isEmpty()) {
-            candidateIdps = identityProviders.candidatesForHomeIdp(context, user);
-            if (candidateIdps != null) {
-                List<IdentityProviderModel> userIdps = getLinkedIdpsFrom(candidateIdps, linkedIdps);
-                if (!userIdps.isEmpty()) {
-                    logFoundIdps("linked", "matching", userIdps, null, user.getUsername());
-                    LOG.tracef("Found %d linked IdPs as fallback for user '%s'", userIdps.size(), user.getUsername());
-                }
-            }
+
+        List<IdentityProviderModel> candidateIdps = identityProviders.candidatesForHomeIdp(context, user);
+        if (candidateIdps == null) {
+            candidateIdps = Collections.emptyList();
         }
-        return candidateIdps;
+        List<IdentityProviderModel> userIdps = getLinkedIdpsFrom(candidateIdps, linkedIdps);
+        if (!userIdps.isEmpty()) {
+            logFoundIdps("linked", "non-matching", userIdps, null, user.getUsername());
+        }
+        return userIdps;
     }
 
     private List<IdentityProviderModel> discoverHomeIdps(AuthenticationFlowContext context, Domain domain, UserModel user, String username) {
