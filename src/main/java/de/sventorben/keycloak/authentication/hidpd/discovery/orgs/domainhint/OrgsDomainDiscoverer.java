@@ -1,5 +1,6 @@
 package de.sventorben.keycloak.authentication.hidpd.discovery.orgs.domainhint;
 
+import de.sventorben.keycloak.authentication.hidpd.discovery.orgs.SelectedOrganization;
 import de.sventorben.keycloak.authentication.hidpd.discovery.spi.HomeIdpDiscoverer;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.IdentityProviderModel;
@@ -30,6 +31,7 @@ final class OrgsDomainDiscoverer implements HomeIdpDiscoverer {
 
         OrganizationModel org = orgProvider.getByDomainName(domain);
         if (org != null) {
+            SelectedOrganization.remember(context, org);
             return org.getIdentityProviders()
                 .filter(IdentityProviderModel::isEnabled)
                 .collect(Collectors.toList());

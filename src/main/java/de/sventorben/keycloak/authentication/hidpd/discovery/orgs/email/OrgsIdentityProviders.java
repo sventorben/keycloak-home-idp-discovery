@@ -2,6 +2,7 @@ package de.sventorben.keycloak.authentication.hidpd.discovery.orgs.email;
 
 import de.sventorben.keycloak.authentication.hidpd.discovery.email.Domain;
 import de.sventorben.keycloak.authentication.hidpd.discovery.email.IdentityProviders;
+import de.sventorben.keycloak.authentication.hidpd.discovery.orgs.SelectedOrganization;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.OrganizationDomainModel;
@@ -48,6 +49,7 @@ final class OrgsIdentityProviders implements IdentityProviders {
                     .filter(it -> domain.getRawValue().equalsIgnoreCase(it.getName()))
                     .anyMatch(OrganizationDomainModel::isVerified);
                 if (verified) {
+                    SelectedOrganization.remember(context, org);
                     return org.getIdentityProviders()
                         .filter(IdentityProviderModel::isEnabled)
                         // TODO: Filter based on domain - should only be one
