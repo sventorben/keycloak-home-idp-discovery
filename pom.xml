@@ -200,7 +200,7 @@ Signed-off-by: GitHub Actions &lt;actions@github.com&gt;</scmDevelopmentCommitCo
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-bom</artifactId>
-                <version>1.63.0</version><!-- needs to be aligne with the quarkus version used by KC -->
+                <version>1.64.0</version><!-- needs to be aligne with the quarkus version used by KC -->
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
