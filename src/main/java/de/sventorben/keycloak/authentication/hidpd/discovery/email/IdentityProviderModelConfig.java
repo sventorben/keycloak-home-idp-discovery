@@ -4,16 +4,18 @@ import org.keycloak.models.Constants;
 import org.keycloak.models.IdentityProviderModel;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
-final class IdentityProviderModelConfig {
+public final class IdentityProviderModelConfig {
 
     private static final String DOMAINS_ATTRIBUTE_KEY = "home.idp.discovery.domains";
     private static final String SUBDOMAINS_ATTRIBUTE_KEY = "home.idp.discovery.matchSubdomains";
 
     private final IdentityProviderModel identityProviderModel;
 
-    IdentityProviderModelConfig(IdentityProviderModel identityProviderModel) {
+    public IdentityProviderModelConfig(IdentityProviderModel identityProviderModel) {
         this.identityProviderModel = identityProviderModel;
     }
 
@@ -54,4 +56,24 @@ final class IdentityProviderModelConfig {
         return key;
     }
 
+    public void setDomains(List<String> domains) {
+        String domainConfigKey = getDomainConfigKey(null);
+        if (domains == null) domains = Collections.emptyList();
+        identityProviderModel.getConfig().put(domainConfigKey, String.join(Constants.CFG_DELIMITER, domains));
+    }
+
+    public Stream<Domain> getDomains() {
+        String key = getDomainConfigKey(null);
+        String domainsAttribute = identityProviderModel.getConfig().getOrDefault(key, "");
+        return Arrays.stream(Constants.CFG_DELIMITER_PATTERN.split(domainsAttribute)).map(Domain::new);
+    }
+
+    public void setMatchDomain(boolean match) {
+        String subdomainConfigKey = getSubdomainConfigKey(null);
+        identityProviderModel.getConfig().put(subdomainConfigKey, String.valueOf(match));
+    }
+
+    public boolean shouldMatchSubDomains() {
+        return shouldMatchSubdomains(null);
+    }
 }
