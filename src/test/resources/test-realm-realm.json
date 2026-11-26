@@ -216,6 +216,31 @@
       "realmRoles" : [ "default-roles-test-realm" ],
       "notBefore" : 0,
       "groups" : [ ]
+  }, {
+      "id" : "a3d58eca-79ad-4fad-a34d-9dd800ce2213",
+      "createdTimestamp" : 1632070461116,
+      "username" : "test7",
+      "enabled" : true,
+      "totp" : false,
+      "email" : "",
+      "emailVerified" : false,
+      "credentials" : [ {
+          "id" : "92501337-4040-41a9-9bbb-f3e2223f1cc0",
+          "type" : "password",
+          "createdDate" : 1632070469930,
+          "secretData" : "{\"value\":\"f0KV+30selJs9QbGBR/Yl62Eu0fRP2EUudbUEYMLgEdeXrRMKZFMtY3OlfG3W9a6ygNflxj9ysUv4j/RwnMN8g==\",\"salt\":\"ZAaXBhufypfX/dSuy9+Pdg==\",\"additionalParameters\":{}}",
+          "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "federatedIdentities" : [ {
+          "identityProvider" : "keycloak-oidc",
+          "userId" : "idp-test7",
+          "userName" : "idp-test7-username"
+      } ],
+      "realmRoles" : [ "default-roles-test-realm" ],
+      "notBefore" : 0,
+      "groups" : [ ]
   } ],
   "scopeMappings": [
     {
